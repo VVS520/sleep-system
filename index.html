@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="description" content="高三睡眠系统档案：从第一性原理理解睡眠如何保护考试输出系统。" />
+  <meta name="build" content="BUILD_V10_REAL_REWRITE / AIR_BG_SIDEBAR_REVISION" />
+  <title>高三睡眠系统档案｜希望中的林木</title>
+  <style>
+    :root{
+      --bg:#03050b;
+      --bg2:#070b14;
+      --panel:rgba(9,14,25,.72);
+      --panel2:rgba(12,20,34,.58);
+      --line:rgba(122, 236, 255, .20);
+      --line2:rgba(255, 63, 98, .22);
+      --text:#edf4ff;
+      --muted:#aab6c7;
+      --dim:#737f91;
+      --red:#ff315f;
+      --cyan:#54e9ff;
+      --blue:#78a7ff;
+      --purple:#a56dff;
+      --ok:#5df8bf;
+      --warn:#ffd166;
+      --bad:#ff5a7d;
+      --radius:24px;
+      --shadow:0 0 40px rgba(84,233,255,.08), 0 0 90px rgba(255,49,95,.06);
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{
+      margin:0;
+      min-height:100svh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+      line-height:1.82;
+      overflow-x:hidden;
+      letter-spacing:.015em;
+      font-size:16px;
+    }
+    body::selection{background:rgba(84,233,255,.28)}
+
+    #particleCanvas{
+      position:fixed;
+      inset:0;
+      z-index:-7;
+      width:100%;height:100%;
+      background:transparent;
+    }
+    .bg-deep,.bg-grid,.bg-scan,.bg-glow,.bg-vignette,.bg-noise{position:fixed;inset:0;pointer-events:none}
+    .bg-deep{
+      z-index:-9;
+      background:
+        radial-gradient(circle at 12% 7%, rgba(255,49,95,.18), transparent 27%),
+        radial-gradient(circle at 84% 12%, rgba(84,233,255,.18), transparent 30%),
+        radial-gradient(circle at 65% 70%, rgba(165,109,255,.12), transparent 34%),
+        linear-gradient(180deg,#060915 0%, #03050b 48%, #04060f 100%);
+    }
+    .bg-grid{
+      z-index:-8;
+      opacity:.42;
+      background-image:
+        linear-gradient(rgba(84,233,255,.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(84,233,255,.09) 1px, transparent 1px),
+        linear-gradient(rgba(255,49,95,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,49,95,.055) 1px, transparent 1px);
+      background-size:64px 64px,64px 64px,192px 192px,192px 192px;
+      mask-image:radial-gradient(circle at 50% 28%, black, transparent 76%);
+    }
+    .bg-scan{
+      z-index:-5;
+      opacity:.20;
+      background:repeating-linear-gradient(180deg, rgba(255,255,255,.055) 0 1px, transparent 1px 7px);
+      mix-blend-mode:screen;
+    }
+    .bg-glow{
+      z-index:-6;
+      background:
+        linear-gradient(90deg, transparent 0 4%, rgba(255,49,95,.18) 5%, transparent 5.3% 94.7%, rgba(84,233,255,.16) 95%, transparent 96%),
+        radial-gradient(ellipse at 50% -18%, rgba(84,233,255,.11), transparent 50%),
+        radial-gradient(ellipse at 50% 118%, rgba(255,49,95,.08), transparent 52%);
+      filter:blur(.2px);
+    }
+    .bg-vignette{z-index:-4;background:radial-gradient(circle at 50% 22%, transparent 0 38%, rgba(0,0,0,.40) 78%, rgba(0,0,0,.74) 100%)}
+    .bg-noise{z-index:-3;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+
+    .topbar{
+      position:fixed;
+      top:max(12px, env(safe-area-inset-top));
+      left:0;right:0;
+      z-index:80;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:0 clamp(14px, 4vw, 34px);
+      pointer-events:none;
+    }
+    .topbar button{pointer-events:auto}
+    .menu-btn,.music-btn,.ghost-btn,.primary-btn,.tab-btn,.small-btn{
+      border:1px solid rgba(160,220,255,.18);
+      color:var(--text);
+      background:rgba(4,8,17,.70);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      border-radius:999px;
+      cursor:pointer;
+      font-family:inherit;
+      touch-action:manipulation;
+      transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    .menu-btn{
+      height:48px;
+      padding:0 18px;
+      font-size:15px;
+      letter-spacing:.14em;
+      box-shadow:0 0 32px rgba(84,233,255,.05);
+    }
+    .music-btn{
+      width:48px;height:48px;
+      display:grid;place-items:center;
+      font-size:18px;
+      border-color:rgba(84,233,255,.24);
+      background:
+        radial-gradient(circle at 64% 34%, rgba(84,233,255,.26), transparent 34%),
+        rgba(4,8,17,.70);
+    }
+    .music-btn.playing{border-color:rgba(84,233,255,.72);box-shadow:0 0 26px rgba(84,233,255,.25)}
+    button:active{transform:scale(.97)}
+    button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+    .progress-line{
+      position:fixed;top:0;left:0;height:3px;width:0%;z-index:120;
+      background:linear-gradient(90deg,var(--red),var(--cyan),var(--purple));
+      box-shadow:0 0 18px rgba(84,233,255,.65);
+    }
+
+    .drawer-mask{
+      position:fixed;inset:0;z-index:95;
+      background:rgba(0,0,0,.48);
+      opacity:0;pointer-events:none;
+      transition:opacity .22s ease;
+    }
+    .drawer-mask.open{opacity:1;pointer-events:auto}
+    .toc-drawer{
+      position:fixed;
+      inset:0 auto 0 0;
+      width:min(86vw, 360px);
+      z-index:100;
+      transform:translateX(-105%);
+      transition:transform .28s cubic-bezier(.2,.82,.2,1);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255,49,95,.18), transparent 34%),
+        radial-gradient(circle at 100% 18%, rgba(84,233,255,.16), transparent 38%),
+        rgba(5,8,17,.92);
+      border-right:1px solid rgba(84,233,255,.24);
+      box-shadow:18px 0 70px rgba(0,0,0,.46);
+      backdrop-filter:blur(24px);
+      -webkit-backdrop-filter:blur(24px);
+      padding:max(24px, env(safe-area-inset-top)) 18px 24px;
+      overflow:auto;
+    }
+    .toc-drawer.open{transform:translateX(0)}
+    .toc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .toc-title{font-size:13px;color:var(--cyan);letter-spacing:.28em;text-transform:uppercase}
+    .toc-close{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.24);color:var(--text)}
+    .toc-list{display:grid;gap:8px}
+    .toc-link{
+      display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;
+      padding:12px 12px;border-radius:18px;
+      color:var(--text);text-decoration:none;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.035);
+    }
+    .toc-link span:first-child{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;color:var(--red);letter-spacing:.14em}
+    .toc-link small{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:2px;letter-spacing:0}
+    .toc-link:hover{border-color:rgba(84,233,255,.35);background:rgba(84,233,255,.055)}
+    .toc-note{margin-top:18px;padding:14px;border:1px solid rgba(84,233,255,.16);border-radius:18px;color:var(--muted);font-size:13px;line-height:1.65;background:rgba(0,0,0,.18)}
+
+    .wrap{
+      width:min(100%, 920px);
+      margin:0 auto;
+      padding:0 clamp(18px, 5vw, 52px) 96px;
+    }
+    .hero{
+      min-height:100svh;
+      display:grid;
+      align-content:center;
+      gap:24px;
+      padding:96px 0 56px;
+    }
+    .archive-card{
+      position:relative;
+      border:1px solid rgba(122,236,255,.18);
+      border-radius:32px;
+      padding:clamp(26px, 7vw, 62px) clamp(20px, 7vw, 60px);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.045), transparent 28%),
+        radial-gradient(circle at 0% 0%, rgba(255,49,95,.11), transparent 32%),
+        radial-gradient(circle at 100% 20%, rgba(84,233,255,.12), transparent 38%),
+        rgba(5,9,18,.62);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .archive-card::before{
+      content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:linear-gradient(90deg, transparent, rgba(84,233,255,.08), transparent);
+      transform:translateX(-120%);animation:sweep 6.8s ease-in-out infinite;
+    }
+    @keyframes sweep{0%,28%{transform:translateX(-120%)}55%,100%{transform:translateX(120%)}}
+    .kicker{
+      color:var(--red);
+      letter-spacing:.48em;
+      font-size:clamp(11px, 2.7vw, 14px);
+      text-transform:uppercase;
+      margin:0 0 14px;
+      opacity:.94;
+      animation:rise .72s ease both .08s;
+    }
+    h1{
+      font-size:clamp(48px, 13vw, 104px);
+      line-height:.98;
+      letter-spacing:-.055em;
+      margin:0;
+      text-wrap:balance;
+      animation:rise .78s ease both .24s;
+      text-shadow:0 0 28px rgba(120,167,255,.15);
+    }
+    .hero-lead{
+      margin:26px 0 0;
+      max-width:680px;
+      color:#d8e2f0;
+      font-size:clamp(17px, 4.2vw, 24px);
+      line-height:1.95;
+      animation:rise .78s ease both .42s;
+    }
+    .author-box{
+      display:grid;gap:8px;
+      width:min(100%, 560px);
+      margin-top:20px;
+      padding:18px 20px;
+      border:1px solid rgba(255,255,255,.11);
+      border-radius:24px;
+      background:rgba(255,255,255,.035);
+      animation:rise .78s ease both .58s;
+    }
+    .label{font-size:12px;letter-spacing:.32em;color:var(--cyan);text-transform:uppercase;font-weight:700}
+    .author-name{font-size:clamp(22px, 5vw, 34px);letter-spacing:.05em}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;animation:rise .78s ease both .72s}
+    .primary-btn,.ghost-btn{min-height:52px;padding:0 22px;font-size:16px;letter-spacing:.08em}
+    .primary-btn{border-color:rgba(84,233,255,.55);box-shadow:0 0 28px rgba(84,233,255,.12);background:rgba(84,233,255,.055)}
+    .ghost-btn{border-color:rgba(255,255,255,.13)}
+    .hero-micro{
+      color:var(--dim);
+      font-size:13px;
+      line-height:1.7;
+      animation:rise .78s ease both .84s;
+    }
+    @keyframes rise{from{opacity:0;transform:translateY(18px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+
+    .chapter{
+      scroll-margin-top:84px;
+      margin:72px 0;
+      padding:clamp(22px, 5.6vw, 42px);
+      border-radius:32px;
+      border:1px solid rgba(122,236,255,.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.042), rgba(255,255,255,.022)),
+        rgba(4,8,17,.64);
+      box-shadow:0 0 64px rgba(0,0,0,.20);
+      position:relative;
+      overflow:hidden;
+    }
+    .chapter::after{
+      content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+      background:linear-gradient(180deg, rgba(84,233,255,.06), transparent 24%, transparent 74%, rgba(255,49,95,.05));
+      opacity:.82;
+    }
+    .chapter>*{position:relative;z-index:1}
+    .chapter-head{display:grid;gap:14px;margin-bottom:26px}
+    .chap-num{font:700 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;color:var(--cyan);letter-spacing:.35em;text-transform:uppercase}
+    h2{font-size:clamp(28px, 7vw, 52px);line-height:1.14;margin:0;letter-spacing:-.04em;text-wrap:balance}
+    .chapter-intro{color:#c6d1df;font-size:clamp(16px, 3.8vw, 20px);line-height:1.95;max-width:720px;margin:0}
+
+    .breath-grid{display:grid;gap:16px;margin:24px 0}
+    @media (min-width:760px){.breath-grid.two{grid-template-columns:1fr 1fr}.breath-grid.three{grid-template-columns:repeat(3,1fr)}}
+    .card,.mini-card,.interactive,.dense-card{
+      border:1px solid rgba(255,255,255,.105);
+      border-radius:24px;
+      background:rgba(255,255,255,.035);
+      padding:clamp(16px, 4vw, 24px);
+      box-shadow:0 0 36px rgba(0,0,0,.15);
+    }
+    .mini-card{padding:18px}
+    .card h3,.interactive h3,.dense-card h3{margin:0 0 12px;font-size:clamp(20px, 4.8vw, 28px);line-height:1.28;letter-spacing:-.025em}
+    .card h4,.mini-card h4{margin:0 0 10px;font-size:17px;color:#f3f7ff}
+    p{margin:0 0 14px;color:#c4cede}
+    p:last-child{margin-bottom:0}
+    .muted{color:var(--muted)}
+    .accent{color:var(--cyan)}
+    .red{color:var(--red)}
+    .warn{color:var(--warn)}
+    .ok{color:var(--ok)}
+    .big-claim{
+      font-size:clamp(20px, 5.2vw, 34px);
+      line-height:1.55;
+      color:#f5f8ff;
+      letter-spacing:-.03em;
+      margin:0;
+    }
+    .logic{
+      counter-reset:step;
+      display:grid;gap:10px;
+      margin:16px 0 0;
+    }
+    .logic div{
+      counter-increment:step;
+      padding:14px 14px 14px 52px;
+      border:1px solid rgba(84,233,255,.12);
+      border-radius:18px;
+      background:rgba(84,233,255,.035);
+      position:relative;
+      color:#cbd7e8;
+    }
+    .logic div::before{
+      content:counter(step);
+      position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;
+      display:grid;place-items:center;
+      font:700 12px/1 ui-monospace, monospace;
+      color:#04101a;background:var(--cyan);
+      box-shadow:0 0 18px rgba(84,233,255,.25);
+    }
+    .rule-list,.judge-list,.clean-list{padding:0;margin:0;display:grid;gap:10px;list-style:none}
+    .rule-list li,.judge-list li,.clean-list li{
+      padding:13px 14px;
+      border-radius:17px;
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.08);
+      color:#cbd5e5;
+    }
+    .rule-list li strong,.judge-list li strong{color:#fff}
+    .judge-list li{border-color:rgba(255,49,95,.13);background:rgba(255,49,95,.035)}
+    .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+    .pill{border:1px solid rgba(84,233,255,.18);color:#d5f8ff;background:rgba(84,233,255,.045);border-radius:999px;padding:7px 11px;font-size:13px;line-height:1.2}
+    .formula{
+      margin:14px 0;
+      padding:14px;
+      border-radius:18px;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(165,109,255,.18);
+      color:#e6e7ff;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height:1.7;
+      overflow:auto;
+    }
+
+    .table-wrap{overflow:auto;border-radius:22px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.15);margin:18px 0}
+    table{width:100%;border-collapse:collapse;min-width:680px;font-size:14px}
+    th,td{padding:14px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.075);vertical-align:top;color:#cbd5e3}
+    th{color:#eaf7ff;background:rgba(84,233,255,.055);font-size:13px;letter-spacing:.08em}
+    tr:last-child td{border-bottom:0}
+
+    .interactive{
+      margin:24px 0;
+      border-color:rgba(84,233,255,.22);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(84,233,255,.11), transparent 34%),
+        radial-gradient(circle at 0% 100%, rgba(255,49,95,.08), transparent 38%),
+        rgba(5,10,20,.70);
+    }
+    .slider-row{display:grid;gap:9px;margin:15px 0}
+    .slider-label{display:flex;justify-content:space-between;gap:10px;color:#dce7f7;font-weight:650}
+    input[type="range"]{width:100%;accent-color:var(--cyan)}
+    .meter{height:16px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+    .meter>div{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--cyan),var(--ok));box-shadow:0 0 18px rgba(84,233,255,.35);transition:width .22s ease}
+    .result-box{
+      margin-top:15px;
+      padding:16px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.11);
+      background:rgba(0,0,0,.22);
+      color:#d4dfef;
+    }
+    .result-box strong{color:#fff}
+    .choice-grid{display:grid;gap:10px;margin:16px 0}
+    @media (min-width:640px){.choice-grid{grid-template-columns:repeat(2,1fr)}}
+    .choice-btn,.chain-btn{
+      text-align:left;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);
+      border-radius:18px;padding:14px 15px;font:inherit;cursor:pointer;line-height:1.5;
+    }
+    .choice-btn.active,.chain-btn.selected{border-color:rgba(84,233,255,.56);background:rgba(84,233,255,.09);box-shadow:0 0 24px rgba(84,233,255,.08)}
+    .tab-row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+    .tab-btn{padding:10px 14px;font-size:14px;line-height:1.35}
+    .tab-btn.active{border-color:rgba(84,233,255,.58);background:rgba(84,233,255,.09)}
+    .small-btn{padding:9px 14px;font-size:14px}
+    .chain-board{display:grid;gap:14px;margin-top:14px}
+    .chain-pool,.chain-selected{display:flex;gap:10px;flex-wrap:wrap;min-height:54px;border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:12px;background:rgba(0,0,0,.18)}
+    .chain-btn{width:auto;text-align:center;padding:10px 12px;border-radius:999px;font-size:14px}
+    .chain-slot{border:1px solid rgba(84,233,255,.18);border-radius:999px;padding:10px 12px;color:#d8f7ff;background:rgba(84,233,255,.045);font-size:14px}
+    .game-box{border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.11);background:rgba(0,0,0,.25);margin-top:14px}
+    #defenseCanvas{display:block;width:100%;height:340px;touch-action:none;background:radial-gradient(circle at 50% 15%, rgba(84,233,255,.09), transparent 36%), rgba(0,0,0,.22)}
+    .game-hud{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.09);color:#dce7f6;font-size:14px}
+    .game-controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+    .master-grid{display:grid;gap:12px;margin-top:18px}
+    @media (min-width:760px){.master-grid{grid-template-columns:repeat(2,1fr)}}
+    .master-item{padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035)}
+    .master-item b{display:block;color:#fff;margin-bottom:6px}
+    .foot-check{
+      color:var(--dim);
+      font-size:13px;
+      line-height:1.8;
+      padding:28px 0 0;
+      border-top:1px solid rgba(255,255,255,.08);
+      margin-top:58px;
+    }
+
+    @media (max-width:520px){
+      body{font-size:15.5px;line-height:1.86}
+      .topbar{padding-inline:12px}
+      .menu-btn{height:44px;padding:0 15px;font-size:14px}
+      .music-btn{width:44px;height:44px}
+      .wrap{padding-inline:18px;padding-bottom:74px}
+      .archive-card{border-radius:28px}
+      .hero{gap:18px;padding-top:82px}
+      .hero-actions{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:12px}
+      .primary-btn,.ghost-btn{padding:0 12px;font-size:15px;min-height:50px}
+      .chapter{margin:56px 0;border-radius:28px;padding:22px 18px}
+      .card,.mini-card,.interactive,.dense-card{border-radius:22px;padding:17px 15px}
+      h2{letter-spacing:-.035em}
+      #defenseCanvas{height:320px}
+      table{font-size:13.5px;min-width:640px}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    }
+  </style>
+</head>
+<body>
+  <!-- BUILD_V10_REAL_REWRITE / AIR_BG_SIDEBAR_REVISION -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div class="bg-deep" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="bg-scan" aria-hidden="true"></div>
+  <div class="bg-noise" aria-hidden="true"></div>
+  <div class="bg-vignette" aria-hidden="true"></div>
+  <div class="progress-line" id="progressLine" aria-hidden="true"></div>
+
+  <audio id="bgm" preload="none" loop src="bgm.mp3"></audio>
+
+  <header class="topbar" aria-label="页面控制">
+    <button class="menu-btn" id="openToc" type="button">目录</button>
+    <button class="music-btn" id="musicBtn" type="button" aria-label="音乐开关">♪</button>
+  </header>
+
+  <div class="drawer-mask" id="tocMask"></div>
+  <aside class="toc-drawer" id="tocDrawer" aria-label="章节目录" aria-hidden="true">
+    <div class="toc-head">
+      <div>
+        <div class="toc-title">Archive Index</div>
+        <strong>高三睡眠系统档案</strong>
+      </div>
+      <button class="toc-close" id="closeToc" type="button" aria-label="关闭目录">×</button>
+    </div>
+    <nav class="toc-list" id="tocList">
+      <a class="toc-link" href="#chapter-00"><span>00</span><span>总命题<small>睡眠是输出系统维护程序</small></span></a>
+      <a class="toc-link" href="#chapter-01"><span>01</span><span>为什么必须睡眠<small>开放系统、清醒负债、维护窗口</small></span></a>
+      <a class="toc-link" href="#chapter-02"><span>02</span><span>S/C/A 三控制器<small>困但睡不着、睡够还困</small></span></a>
+      <a class="toc-link" href="#chapter-03"><span>03</span><span>睡眠结构<small>N1、N2、N3、REM 与碎片化</small></span></a>
+      <a class="toc-link" href="#chapter-04"><span>04</span><span>考试输出链<small>注意力、记忆、监控、稳定调用</small></span></a>
+      <a class="toc-link" href="#chapter-05"><span>05</span><span>作息参数<small>夜间、午睡、光照、运动、饮食</small></span></a>
+      <a class="toc-link" href="#chapter-06"><span>06</span><span>故障诊断<small>按症状定位变量</small></span></a>
+      <a class="toc-link" href="#chapter-07"><span>07</span><span>高三运行协议<small>按崩盘程度切换执行规则</small></span></a>
+      <a class="toc-link" href="#chapter-08"><span>08</span><span>一页总控表<small>核心公理与操作指标压缩</small></span></a>
+      <a class="toc-link" href="#chapter-09"><span>09</span><span>深读附录<small>第一性原理闭环</small></span></a>
+    </nav>
+    <div class="toc-note">目录是侧边栏。点击任意章节后会自动跳转并关闭，不会遮挡正文。</div>
+  </aside>
+
+  <main class="wrap">
+    <section class="hero" id="top">
+      <div class="archive-card">
+        <p class="kicker">Senior Three · Sleep System · Archive</p>
+        <h1>高三睡眠<br>系统档案</h1>
+        <p class="hero-lead">不是少学一小时，而是保住第二天的有效输出。睡眠不是学习的敌人，而是注意力、工作记忆、记忆提取、错误监控和情绪稳定的底层维护程序。</p>
+        <div class="author-box">
+          <span class="label">Author</span>
+          <span class="author-name">希望中的林木</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="primary-btn" id="startRead" type="button">开始阅读正文</button>
+        <button class="ghost-btn" id="openTocHero" type="button">打开目录</button>
+      </div>
+      <p class="hero-micro">移动端优先。正文允许自然滚动；没有右下角悬浮箭头，也没有遮挡阅读的闪电按钮。</p>
+    </section>
+
+    <section class="chapter" id="chapter-00">
+      <div class="chapter-head">
+        <span class="chap-num">00 / Master Claim</span>
+        <h2>总命题：睡眠是考试输出系统的维护程序</h2>
+        <p class="chapter-intro">高考不是只考你脑子里“有没有知识库存”。更准确地说，它考的是：在限时、高压、低容错环境中，你的神经系统能否稳定地调用库存、维持条件、抑制错误、完成推理并写出答案。</p>
+      </div>
+      <div class="card">
+        <p class="big-claim">睡眠不是为了舒服，而是为了让第二天的大脑从“能醒着”恢复到“能输出”。</p>
+      </div>
+      <div class="breath-grid two">
+        <div class="mini-card">
+          <h4>核心命题</h4>
+          <p>学习把信息写进系统，睡眠负责清理、重排、巩固和重新校准系统。只输入不维护，短期看像努力，第二天会表现为读题慢、条件丢、记忆卡、计算飘、情绪炸。</p>
+        </div>
+        <div class="mini-card">
+          <h4>高三场景</h4>
+          <p>真正危险的不是“少睡一次”，而是连续把睡眠窗口挤掉后，自己还用意志力解释为“我只是状态不好”。状态不是玄学，是 S、C、A、睡眠结构和身体负荷共同输出的结果。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>本档案的判断标准</h3>
+        <ul class="judge-list">
+          <li><strong>读题指标：</strong>一道题读两遍仍漏条件，说明注意力门控和工作记忆保持已经下降。</li>
+          <li><strong>错误指标：</strong>连续低级错、符号错、看错问法，优先怀疑睡眠债或唤醒过高，而不是立刻骂自己不努力。</li>
+          <li><strong>情绪指标：</strong>一点小事就爆炸、想逃避、越刷手机越停不下，常见于 A 系统过高叠加恢复不足。</li>
+          <li><strong>输出指标：</strong>学了很久但没有可验证产出，说明系统处在空转，不是有效复习。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-01">
+      <div class="chapter-head">
+        <span class="chap-num">01 / Why Sleep Is Necessary</span>
+        <h2>为什么必须睡眠：清醒不是免费状态</h2>
+        <p class="chapter-intro">第一性原理从这里开始：生命是开放系统。只要活着，就必须从外界输入能量和物质，同时把代谢废物、热量和错误状态排出去。清醒学习是一种高输出模式，必然产生负债。</p>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>核心命题</h3>
+          <p>清醒不是“默认正常”，而是一个持续消耗能量、持续改变突触连接、持续积累代谢副产物、持续承受情绪刺激的运行状态。</p>
+        </div>
+        <div class="card">
+          <h3>底层机制</h3>
+          <p>神经元通信需要离子梯度、递质释放、膜电位恢复和胶质细胞支持。你越长时间保持清醒，系统越需要维护：能量账要补、连接权重要重标定、废物要清、情绪反应阈值要校准。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>四类清醒负债</h3>
+        <div class="breath-grid two">
+          <div class="mini-card"><h4>能量负债</h4><p>大脑耗能高，但储能能力弱。长时间清醒后，前额叶这类高阶控制区域更容易掉线，于是你还能坐着，却不一定还能有效分析。</p></div>
+          <div class="mini-card"><h4>突触负债</h4><p>白天学习会改变大量连接强度。若不重整，信号会越来越嘈杂：重要内容和无关刺激都在抢通道。</p></div>
+          <div class="mini-card"><h4>代谢负债</h4><p>神经活动会产生代谢副产物。睡眠不是“关闭”，而是把部分维护流程切到更适合清理与修复的模式。</p></div>
+          <div class="mini-card"><h4>情绪负债</h4><p>清醒越久，杏仁核等威胁系统越容易放大反应，前额叶抑制能力下降，表现为烦躁、焦虑、想逃、钻牛角尖。</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>推导链条</h3>
+        <div class="logic">
+          <div>生命必须维持稳态；稳态不是静止，而是不断修正偏差。</div>
+          <div>清醒学习要求大脑持续对外输入、加工、决策和输出，因此必然制造系统偏差。</div>
+          <div>偏差积累到一定程度后，继续硬顶会使单位时间学习收益下降、错误率上升。</div>
+          <div>睡眠提供低外界输入的维护窗口，让清理、巩固、校准和情绪降噪更容易完成。</div>
+          <div>所以睡眠不是奖励，而是高输出系统必须支付的维护成本。</div>
+        </div>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>操作规则</h3>
+          <ul class="rule-list">
+            <li><strong>不要用熬夜证明努力：</strong>高三后期的关键不是“多塞内容”，而是让第二天能调用内容。</li>
+            <li><strong>夜间优先完整周期：</strong>睡眠被频繁打断时，时间看似够，结构可能不够。</li>
+            <li><strong>崩盘日先保系统：</strong>读题都读不进去时，继续刷难题往往是在强化挫败。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>判断标准</h3>
+          <ul class="judge-list">
+            <li>同一段话读三遍还不知道中心，优先怀疑注意力负债。</li>
+            <li>明明会但步骤断裂，优先怀疑工作记忆和错误监控下降。</li>
+            <li>越到晚上越想刷手机，可能不是自控力单点问题，而是 A 系统抢占控制权。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-02">
+      <div class="chapter-head">
+        <span class="chap-num">02 / S C A Controllers</span>
+        <h2>S/C/A 三控制器模型：不是困了就一定能睡</h2>
+        <p class="chapter-intro">睡眠不是由一个开关决定，而更像三个控制器的合成结果：S 是睡眠压力，C 是昼夜节律，A 是觉醒系统。三者方向不一致，就会出现“很困但睡不着”“睡够还困”“白天困晚上精神”。</p>
+      </div>
+      <div class="breath-grid three">
+        <div class="mini-card"><h4>S：睡眠压力</h4><p>清醒时间越长，睡眠压力越高。它像“必须维护”的累计账单。</p></div>
+        <div class="mini-card"><h4>C：昼夜节律</h4><p>身体根据光照、时间、进食和活动预测什么时候该清醒、什么时候该进入夜间。</p></div>
+        <div class="mini-card"><h4>A：觉醒系统</h4><p>压力、手机强光、情绪复盘、高难题、咖啡因会把系统推向警戒和兴奋。</p></div>
+      </div>
+      <div class="card">
+        <h3>推导链条</h3>
+        <div class="logic">
+          <div>S 高，说明维护需求高；但它只提供睡眠动力，不保证能立刻睡着。</div>
+          <div>C 决定身体是否把当前时间解释为“适合睡眠的夜间窗口”。</div>
+          <div>A 决定系统是否处在警戒、兴奋、威胁监控或奖赏追逐状态。</div>
+          <div>入睡需要 S 足够高、C 指向夜间、A 足够低；任何一个变量反向，都可能破坏睡眠。</div>
+        </div>
+      </div>
+
+      <div class="interactive" id="scaLab">
+        <h3>S/C/A 调参实验室</h3>
+        <p class="muted">拖动三个滑杆，观察入睡概率如何变化。这里的数值是教学模型，不是医学诊断。</p>
+        <div class="slider-row">
+          <div class="slider-label"><span>S 睡眠压力</span><span id="sVal">70</span></div>
+          <input id="sRange" type="range" min="0" max="100" value="70" />
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>C 夜间同步度</span><span id="cVal">65</span></div>
+          <input id="cRange" type="range" min="0" max="100" value="65" />
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>A 觉醒强度</span><span id="aVal">35</span></div>
+          <input id="aRange" type="range" min="0" max="100" value="35" />
+        </div>
+        <div class="meter" aria-label="入睡概率"><div id="sleepMeter"></div></div>
+        <div class="result-box" id="scaResult"></div>
+      </div>
+
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>高三场景</h3>
+          <p><strong>困但睡不着：</strong>S 高，但 A 更高。比如晚上刷手机、复盘考试、做高难压轴，大脑被推到警戒或兴奋状态。</p>
+          <p><strong>白天困晚上精神：</strong>C 被推迟。白天光照不足、晚间强光过多、午睡太晚，都会让身体把“晚上”误判成可继续清醒。</p>
+        </div>
+        <div class="card">
+          <h3>操作规则</h3>
+          <ul class="rule-list">
+            <li><strong>早晨用光照校准 C：</strong>起床后尽快接触自然光，帮助身体确认白天开始。</li>
+            <li><strong>睡前降低 A：</strong>少做高刺激内容，减少强光、争论、情绪复盘和高难题。</li>
+            <li><strong>午睡不压垮 C：</strong>默认 20 分钟左右；严重睡眠债可用完整周期，但不要拖到傍晚。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-03">
+      <div class="chapter-head">
+        <span class="chap-num">03 / Sleep Architecture</span>
+        <h2>睡眠结构：时间够，不等于结构够</h2>
+        <p class="chapter-intro">睡眠由多个阶段循环构成。你不是把大脑“关机”，而是在不同阶段执行不同维护任务。高三最容易忽略的是：碎片化会破坏结构，醒来时机也会影响当天启动质量。</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>阶段</th><th>主要特征</th><th>对高三的意义</th><th>被破坏后的表现</th></tr></thead>
+          <tbody>
+            <tr><td>N1</td><td>入睡过渡，意识逐渐脱离外界。</td><td>让系统从外界输入模式切到维护模式。</td><td>容易惊醒，感觉“刚要睡就弹回来”。</td></tr>
+            <tr><td>N2</td><td>稳定睡眠的重要部分，外界输入进一步降低。</td><td>帮助信息筛选、感觉门控和基础恢复。</td><td>睡得浅、容易被声音或念头打断。</td></tr>
+            <tr><td>N3</td><td>深睡，身体恢复和慢波活动更突出。</td><td>对体力、免疫、疲劳恢复、部分记忆巩固重要。</td><td>醒来身体沉、疲劳难消。</td></tr>
+            <tr><td>REM</td><td>快速眼动，梦多，情绪和记忆整合活跃。</td><td>对情绪降噪、联想整合和复杂材料处理有价值。</td><td>情绪更脆、梦境混乱、白天心理噪声大。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>深睡、REM 与周期</h3>
+          <p>一个睡眠周期通常包含从浅睡到深睡再到 REM 的循环。前半夜深睡比例更重要，后半夜 REM 比例更高。高三晚睡晚起并不只是平移时间，因为光照、上学时间、早餐和考试时间都会强行拉扯 C。</p>
+        </div>
+        <div class="card">
+          <h3>碎片化与睡眠惯性</h3>
+          <p>夜里醒很多次，会让睡眠结构被切碎。睡眠惯性则是刚醒时大脑还没有完全切回清醒输出模式，表现为脑子沉、反应慢、想继续睡。午睡过长或从深睡中被叫醒，容易出现这种情况。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>推导链条</h3>
+        <div class="logic">
+          <div>维护任务不是单一任务，所以睡眠必须分阶段执行。</div>
+          <div>不同阶段承担不同权重的恢复、巩固、情绪整合和感觉屏蔽。</div>
+          <div>碎片化会使阶段无法完整推进，即使总时长看起来不短，维护质量也可能不足。</div>
+          <div>醒来时若处在深睡惯性中，短时间内前额叶输出能力会下降。</div>
+        </div>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>操作规则</h3>
+          <ul class="rule-list">
+            <li>夜间优先保护连续性：睡前减少喝太多水、强刺激和情绪争执。</li>
+            <li>午睡默认短睡：20 分钟左右主要降低疲劳，不强行进入深睡。</li>
+            <li>严重睡眠债才用完整周期午睡：并且避免下午太晚。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>判断标准</h3>
+          <ul class="judge-list">
+            <li>睡醒 30–60 分钟仍明显懵，考虑睡眠惯性或结构不足。</li>
+            <li>总时长够但白天断片，考虑夜间碎片化、恢复债或身体干扰。</li>
+            <li>越睡越乱，优先固定起床锚点和晨光，而不是盲目延长卧床。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-04">
+      <div class="chapter-head">
+        <span class="chap-num">04 / Exam Output</span>
+        <h2>睡眠如何决定考试输出：高考考的是稳定调用</h2>
+        <p class="chapter-intro">知识库存只是起点。真正上考场时，你需要把注意力、工作记忆、长期记忆、推理、抑错和检查串成一条链。睡眠不足最先破坏的往往不是“会不会”，而是“能不能稳定调用”。</p>
+      </div>
+      <div class="breath-grid three">
+        <div class="mini-card"><h4>注意力</h4><p>决定你能否把题干真正读进去，而不是眼睛扫过。</p></div>
+        <div class="mini-card"><h4>工作记忆</h4><p>决定你能否临时保持条件、变量、限制和中间结果。</p></div>
+        <div class="mini-card"><h4>长期记忆提取</h4><p>决定你能否在压力下把公式、模型、词义和题型调出来。</p></div>
+        <div class="mini-card"><h4>错误监控</h4><p>决定你能否发现自己看错、算错、方向错。</p></div>
+        <div class="mini-card"><h4>情绪控制</h4><p>决定你遇到难题时是切换策略，还是被挫败感接管。</p></div>
+        <div class="mini-card"><h4>持续输出</h4><p>决定你能否从第一科撑到最后一科，而不是前面硬顶后面塌。</p></div>
+      </div>
+      <div class="interactive" id="chainGame">
+        <h3>考试输出链小游戏</h3>
+        <p class="muted">按你认为的顺序点击。答案不会提前显示；点完 7 步后才反馈。</p>
+        <div class="chain-board">
+          <div class="chain-pool" id="chainPool"></div>
+          <div>
+            <div class="label">你的排序</div>
+            <div class="chain-selected" id="chainSelected"></div>
+          </div>
+        </div>
+        <div class="game-controls">
+          <button class="small-btn" id="resetChain" type="button">重新排序</button>
+        </div>
+        <div class="result-box" id="chainResult">还没有完成排序。</div>
+      </div>
+      <div class="card">
+        <h3>底层机制与推导</h3>
+        <div class="logic">
+          <div>题目首先必须被注意力选中，否则后面的知识再多也无法启动。</div>
+          <div>条件需要暂存在工作记忆中；睡眠不足会让这个暂存空间变小、易丢。</div>
+          <div>长期记忆提取需要线索匹配；疲劳和焦虑会制造噪声，降低提取速度。</div>
+          <div>推理计算需要连续步骤；前一步残留不稳，后一步就容易断链。</div>
+          <div>错误监控依赖前额叶控制；睡眠债会让“我是不是看错了”的报警变弱。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-05">
+      <div class="chapter-head">
+        <span class="chap-num">05 / Parameters</span>
+        <h2>作息参数：用少数关键变量稳定系统</h2>
+        <p class="chapter-intro">高三不是实验生活方式的阶段。作息参数的目标不是追求完美，而是降低波动：让 C 有锚点，让 S 正常累计，让 A 在该低的时候降下来。</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>参数</th><th>建议范围</th><th>第一性原理</th><th>判断标准</th></tr></thead>
+          <tbody>
+            <tr><td>夜间睡眠</td><td>尽量保持稳定起床；高三后期优先 6–7 个完整周期附近。</td><td>连续维护窗口比临时硬补更稳定。</td><td>第二天读题、记忆提取、低级错是否改善。</td></tr>
+            <tr><td>午睡</td><td>默认 20 分钟左右；严重缺觉可 1 个完整周期；下午晚些时候不长睡。</td><td>短睡降低 S 的尖峰，不明显破坏 C；长睡可能产生惯性和节律推迟。</td><td>醒后 20 分钟内能否启动，而不是更懵。</td></tr>
+            <tr><td>光照</td><td>早晨尽快接触自然光；睡前降低强光，尤其是手机近距离强刺激。</td><td>光是 C 的强校准信号。</td><td>晚上困意是否更稳定，白天是否更清醒。</td></tr>
+            <tr><td>运动</td><td>白天低到中等强度；睡前避免过强兴奋。</td><td>运动改善代谢与节律，但太晚太强会推高 A。</td><td>运动后精神稳定，而不是夜里更兴奋。</td></tr>
+            <tr><td>饮食</td><td>睡前避免过饱、过辣、过多饮水；晚饭不极端。</td><td>胃肠负担和夜醒会破坏连续性。</td><td>夜里醒来次数是否减少。</td></tr>
+            <tr><td>咖啡因</td><td>慎用；尽量不在下午后使用。</td><td>咖啡因降低困意感知，但不消除真实睡眠债，还可能推高 A。</td><td>晚上是否入睡延迟、心慌、浅睡。</td></tr>
+            <tr><td>考前稳定</td><td>考前一周不大改作息，不做激进补觉或熬夜。</td><td>C 需要稳定信号；临时大改容易引入新波动。</td><td>考试时段是否接近平时清醒峰值。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="interactive" id="defenseGame">
+        <h3>睡眠窗口防守小游戏</h3>
+        <p class="muted">点击或触摸掉落项。干扰项要击落；保护项不要乱点。目标不是好玩，而是让你记住：晚上要保护的是 A 和 C。</p>
+        <div class="game-hud">
+          <span>防守分：<b id="defenseScore">0</b></span>
+          <span>剩余：<b id="defenseTime">20</b>s</span>
+          <span>状态：<b id="defenseState">待开始</b></span>
+        </div>
+        <div class="game-box"><canvas id="defenseCanvas"></canvas></div>
+        <div class="game-controls">
+          <button class="small-btn" id="startDefense" type="button">开始 20 秒</button>
+          <button class="small-btn" id="stopDefense" type="button">结束</button>
+        </div>
+        <div class="result-box" id="defenseExplain">干扰项：手机强光、情绪复盘、晚间高难题、咖啡因、太晚长午睡、焦虑内耗。保护项：晨光、低强度散步、20 分钟午睡、整理书包、低唤醒过渡。</div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-06">
+      <div class="chapter-head">
+        <span class="chap-num">06 / Fault Diagnosis</span>
+        <h2>故障诊断系统：先定位变量，再决定怎么办</h2>
+        <p class="chapter-intro">同样是困，原因可能完全不同。高三最怕把所有问题都归因成“我废了”或“我不自律”。更有效的做法是按症状定位 S、C、A、睡眠结构、身体干扰或恢复债。</p>
+      </div>
+      <div class="interactive" id="diagnosis">
+        <h3>睡眠故障诊断选择题</h3>
+        <p class="muted">选择最接近你的症状，系统会给出优先怀疑变量和底层机制。</p>
+        <div class="choice-grid" id="diagChoices"></div>
+        <div class="result-box" id="diagResult">请选择一个症状。</div>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>诊断原则</h3>
+          <ul class="rule-list">
+            <li><strong>先看时间：</strong>是入睡困难、夜醒、早醒，还是白天启动困难？</li>
+            <li><strong>再看触发：</strong>是否有手机、咖啡因、争执、晚间难题、太晚午睡？</li>
+            <li><strong>最后看恢复：</strong>连续几天缺觉后，即使睡一晚，也可能还在还债。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>高三判断标准</h3>
+          <ul class="judge-list">
+            <li>如果是 A 高，就不要再用高刺激方式“逼自己睡”。</li>
+            <li>如果是 C 乱，优先固定起床、晨光和晚间降光。</li>
+            <li>如果是恢复债，不要指望一晚完全清零，要看 2–4 天趋势。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-07">
+      <div class="chapter-head">
+        <span class="chap-num">07 / Protocol</span>
+        <h2>高三运行协议：按状态切换任务强度</h2>
+        <p class="chapter-intro">协议的核心不是每天做同一张计划表，而是按系统状态切换任务强度。正常日维持系统，轻度崩盘日阻断恶性循环，重度崩盘日保护最低有效输出，考前阶段不实验。</p>
+      </div>
+      <div class="interactive" id="protocolSwitcher">
+        <h3>协议切换器</h3>
+        <div class="tab-row" id="protocolTabs"></div>
+        <div class="result-box" id="protocolContent"></div>
+      </div>
+      <div class="card">
+        <h3>总推导</h3>
+        <div class="logic">
+          <div>考试前最稀缺的不是形式时间，而是可用认知控制。</div>
+          <div>可用控制下降时，继续增加任务难度会提高错误率和挫败感。</div>
+          <div>因此协议必须随状态切换：状态好时推进，状态差时止损。</div>
+          <div>止损不是躺平，而是把系统从失控边缘拉回可输出区间。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-08">
+      <div class="chapter-head">
+        <span class="chap-num">08 / Master Table</span>
+        <h2>一页总控表：把系统压缩成可执行规则</h2>
+        <p class="chapter-intro">如果只能记住一页，就记住这张表。它不是口号，而是从开放系统、清醒负债、睡眠维护、三控制器、睡眠结构和考试输出链压缩出来的操作版。</p>
+      </div>
+      <div class="master-grid">
+        <div class="master-item"><b>核心公理</b><span>清醒学习产生负债；睡眠是维护窗口；考试考稳定输出，不只考库存。</span></div>
+        <div class="master-item"><b>S/C/A</b><span>S 要够，C 要对时，A 要降。困但睡不着通常不是 S 不够，而是 A 太高或 C 错位。</span></div>
+        <div class="master-item"><b>睡眠结构</b><span>N1/N2/N3/REM 分工不同。总时长、连续性、醒来时机都影响第二天启动。</span></div>
+        <div class="master-item"><b>个人操作</b><span>早晨见光，白天推进，午睡短稳，晚上降刺激，考前不实验。</span></div>
+        <div class="master-item"><b>判断指标</b><span>读题、条件保持、低级错、情绪波动、白天断片，比“我感觉努不努力”更可靠。</span></div>
+        <div class="master-item"><b>崩盘处理</b><span>轻崩盘降难度，重崩盘先补系统。不要在失控状态下用高难题证明自己。</span></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>场景</th><th>优先动作</th><th>禁止动作</th><th>成功标志</th></tr></thead>
+          <tbody>
+            <tr><td>晚上精神</td><td>降光、离手机、低唤醒过渡。</td><td>继续刷短视频或做压轴题。</td><td>困意逐渐连续，而不是越躺越兴奋。</td></tr>
+            <tr><td>白天困</td><td>晨光、短午睡、低强度散步、基础题启动。</td><td>无限喝咖啡硬顶。</td><td>下午能完成可验证任务。</td></tr>
+            <tr><td>睡够还困</td><td>检查碎片化、恢复债、睡眠惯性和身体干扰。</td><td>立刻否定睡眠策略。</td><td>连续几天趋势变稳。</td></tr>
+            <tr><td>考试当天</td><td>用熟悉流程进入输出，不追求临场超常。</td><td>临时改变饮食、咖啡因或睡眠节奏。</td><td>读题清楚、低级错减少、情绪可控。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chapter" id="chapter-09">
+      <div class="chapter-head">
+        <span class="chap-num">09 / Deep Appendix</span>
+        <h2>深读附录：第一性原理闭环</h2>
+        <p class="chapter-intro">这一章把全书逻辑闭合：从生命开放系统出发，推到清醒负债，再推到睡眠维护、S/C/A 控制、睡眠结构、认知输出、作息参数、故障诊断和高三协议。</p>
+      </div>
+      <div class="card">
+        <h3>完整闭环</h3>
+        <div class="logic">
+          <div>生命是开放系统：必须持续输入能量与物质，同时排出废物并修正内部偏差。</div>
+          <div>清醒是对外输出模式：学习、刷题、情绪应对和社交刺激都会增加能量、突触、代谢与情绪负债。</div>
+          <div>负债不能无限累积：超过系统承载后，最先下降的是前额叶控制、注意力稳定和错误监控。</div>
+          <div>睡眠是维护模式：降低外界输入，让清理、巩固、重整、情绪降噪和节律校准更容易发生。</div>
+          <div>S/C/A 决定睡不睡得进去：维护需求、时间窗口和觉醒强度必须同向。</div>
+          <div>睡眠结构决定维护质量：N1、N2、N3、REM 分工不同，碎片化会让维护流程不完整。</div>
+          <div>认知输出是最终验收：注意力、工作记忆、长期记忆提取、错误监控、情绪控制和持续输出能力共同决定考场表现。</div>
+          <div>作息参数是控制杆：光照、午睡、运动、饮食、咖啡因和睡前刺激，本质上都是在调 S、C、A 和结构。</div>
+          <div>故障诊断让行动不乱：根据症状定位变量，而不是把所有问题都解释成懒、废或意志力差。</div>
+          <div>高三协议是闭环落地：正常日推进，轻崩盘止损，重崩盘保底，考前不实验，考试当天保稳定输出。</div>
+        </div>
+      </div>
+      <div class="breath-grid two">
+        <div class="card">
+          <h3>最后的操作规则</h3>
+          <ul class="rule-list">
+            <li>用第二天输出质量评价睡眠策略，而不是用睡眠时长单独评价。</li>
+            <li>用“读题是否清楚、条件是否保持、低级错是否减少”评价复习有效性。</li>
+            <li>状态差时把任务切小，先恢复可控感，再恢复强度。</li>
+            <li>考前最重要的不是制造刺激，而是减少变量。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>最终判断标准</h3>
+          <ul class="judge-list">
+            <li>如果第二天能稳定读题，说明系统维护方向正确。</li>
+            <li>如果学习时间增加但错误率上升，说明需要调整负荷，不是继续加码。</li>
+            <li>如果晚上被手机吞掉，优先设计环境阻断，不要只靠临时意志力。</li>
+            <li>如果连续数日恢复后仍明显异常，应考虑身体因素并寻求现实帮助。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot-check">
+      <p>版本：BUILD_V10_REAL_REWRITE / AIR_BG_SIDEBAR_REVISION。页面末尾保留自检清单为代码注释，不在正文展示。</p>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+      const BUILD = 'BUILD_V10_REAL_REWRITE';
+      const $ = (sel, root=document) => root.querySelector(sel);
+      const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+      const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+      // Background particles
+      const pCanvas = $('#particleCanvas');
+      const pctx = pCanvas.getContext('2d');
+      let particles = [];
+      let rafParticle = 0;
+      function resizeParticles(){
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        pCanvas.width = Math.floor(innerWidth * dpr);
+        pCanvas.height = Math.floor(innerHeight * dpr);
+        pCanvas.style.width = innerWidth + 'px';
+        pCanvas.style.height = innerHeight + 'px';
+        pctx.setTransform(dpr,0,0,dpr,0,0);
+        const count = clamp(Math.floor(innerWidth * innerHeight / 14000), 36, 96);
+        particles = Array.from({length:count}, () => ({
+          x: Math.random()*innerWidth,
+          y: Math.random()*innerHeight,
+          r: Math.random()*1.8 + .45,
+          vx: (Math.random()-.5)*.32,
+          vy: (Math.random()-.5)*.28,
+          hue: Math.random()>.55 ? 'cyan' : (Math.random()>.5 ? 'red' : 'blue'),
+          a: Math.random()*.55 + .18
+        }));
+      }
+      function drawParticles(){
+        pctx.clearRect(0,0,innerWidth,innerHeight);
+        for(const p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < -20) p.x = innerWidth + 20;
+          if(p.x > innerWidth + 20) p.x = -20;
+          if(p.y < -20) p.y = innerHeight + 20;
+          if(p.y > innerHeight + 20) p.y = -20;
+          const color = p.hue === 'cyan' ? `rgba(84,233,255,${p.a})` : p.hue === 'red' ? `rgba(255,49,95,${p.a})` : `rgba(120,167,255,${p.a})`;
+          pctx.beginPath();
+          pctx.fillStyle = color;
+          pctx.shadowColor = color;
+          pctx.shadowBlur = 10;
+          pctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          pctx.fill();
+          pctx.shadowBlur = 0;
+        }
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx=a.x-b.x, dy=a.y-b.y, dist=Math.hypot(dx,dy);
+            if(dist < 118){
+              pctx.strokeStyle = `rgba(84,233,255,${(1-dist/118)*.055})`;
+              pctx.lineWidth = 1;
+              pctx.beginPath();pctx.moveTo(a.x,a.y);pctx.lineTo(b.x,b.y);pctx.stroke();
+            }
+          }
+        }
+        rafParticle = requestAnimationFrame(drawParticles);
+      }
+      window.addEventListener('resize', resizeParticles, {passive:true});
+      resizeParticles(); drawParticles();
+
+      // Progress
+      const progressLine = $('#progressLine');
+      function updateProgress(){
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const pct = max > 0 ? (scrollY / max) * 100 : 0;
+        progressLine.style.width = pct + '%';
+      }
+      document.addEventListener('scroll', updateProgress, {passive:true});
+      updateProgress();
+
+      // TOC drawer
+      const drawer = $('#tocDrawer');
+      const mask = $('#tocMask');
+      function openDrawer(){ drawer.classList.add('open'); mask.classList.add('open'); drawer.setAttribute('aria-hidden','false'); }
+      function closeDrawer(){ drawer.classList.remove('open'); mask.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+      $('#openToc').addEventListener('click', openDrawer);
+      $('#openTocHero').addEventListener('click', openDrawer);
+      $('#closeToc').addEventListener('click', closeDrawer);
+      mask.addEventListener('click', closeDrawer);
+      $$('.toc-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = $(a.getAttribute('href'));
+          if(target){
+            closeDrawer();
+            setTimeout(() => target.scrollIntoView({behavior:'smooth', block:'start'}), 40);
+          }
+        });
+      });
+      document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDrawer(); });
+
+      // Music
+      const audio = $('#bgm');
+      const musicBtn = $('#musicBtn');
+      async function tryPlay(){
+        try{
+          audio.volume = 0.45;
+          await audio.play();
+          musicBtn.classList.add('playing');
+          musicBtn.textContent = 'Ⅱ';
+        }catch(err){
+          musicBtn.classList.remove('playing');
+          musicBtn.textContent = '♪';
+        }
+      }
+      function toggleMusic(){
+        if(audio.paused) tryPlay();
+        else { audio.pause(); musicBtn.classList.remove('playing'); musicBtn.textContent = '♪'; }
+      }
+      musicBtn.addEventListener('click', toggleMusic);
+      $('#startRead').addEventListener('click', () => {
+        tryPlay();
+        $('#chapter-00').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+
+      // SCA lab
+      const sRange = $('#sRange'), cRange = $('#cRange'), aRange = $('#aRange');
+      const sVal = $('#sVal'), cVal = $('#cVal'), aVal = $('#aVal');
+      const sleepMeter = $('#sleepMeter'), scaResult = $('#scaResult');
+      function updateSca(){
+        const S = +sRange.value, C = +cRange.value, A = +aRange.value;
+        sVal.textContent = S; cVal.textContent = C; aVal.textContent = A;
+        let score = 0.48*S + 0.42*C - 0.62*A + 18;
+        if(S > 72 && C > 62 && A < 38) score += 10;
+        if(A > 72) score -= 14;
+        if(C < 32) score -= 10;
+        const prob = clamp(Math.round(score), 0, 100);
+        sleepMeter.style.width = prob + '%';
+        let title, explain;
+        if(prob >= 75){ title = '入睡条件较好'; explain = 'S 有维护压力，C 接近夜间窗口，A 没有明显压制睡眠。此时最重要的是不要再引入手机、争执、高难题等刺激。'; }
+        else if(A >= 65){ title = '优先怀疑 A 过高'; explain = '你可能很困，但觉醒系统仍在警戒或兴奋。困意是 S，高唤醒是 A；两者可以同时存在。'; }
+        else if(C <= 38){ title = '优先怀疑 C 错位'; explain = '身体没有把当前时间稳定解释为夜间窗口。早晨光照不足、晚间强光、太晚午睡都可能推迟节律。'; }
+        else if(S <= 35){ title = '优先怀疑 S 不足'; explain = '睡眠压力不够，常见于起床太晚、午睡过长或白天活动不足。'; }
+        else { title = '条件中等，需要降低噪声'; explain = '不是不能睡，而是几个变量互相拉扯。最稳的策略是降低 A、固定 C，不再追加刺激。'; }
+        scaResult.innerHTML = `<strong>${title}：${prob}%</strong><br>${explain}`;
+      }
+      [sRange,cRange,aRange].forEach(r => r.addEventListener('input', updateSca));
+      updateSca();
+
+      // Diagnosis
+      const diagData = [
+        {sym:'很困但睡不着', var:'A 觉醒系统过高', text:'S 已经高了，但 A 更高。手机强光、情绪复盘、焦虑、咖啡因或晚间高难题会让大脑保持警戒。处理方向不是继续逼睡，而是降光、降刺激、降认知负荷。'},
+        {sym:'白天困，晚上精神', var:'C 昼夜节律错位', text:'身体把清醒峰值推迟了。常见原因是早晨光照不足、晚上强光过多、午睡太晚或作息摆动。处理方向是固定起床锚点、晨光、晚间降光。'},
+        {sym:'睡够还困', var:'睡眠结构 / 恢复债', text:'总时长够不等于结构够。夜醒、浅睡、睡眠惯性、连续缺觉后的恢复债都可能让你仍然困。处理方向是看连续几天趋势，而不是只看一晚。'},
+        {sym:'午睡后更懵', var:'睡眠惯性', text:'午睡过长或被从深睡中叫醒，清醒系统没有完全接管。处理方向是默认短午睡，严重缺觉才用完整周期，并预留醒后缓冲。'},
+        {sym:'夜里醒很多次', var:'睡眠碎片化 / 身体干扰', text:'睡眠阶段被切碎，维护流程不能连续推进。可能与压力、饮水、胃肠负担、环境噪声、温度或身体不适有关。处理方向是先减少可控干扰。'},
+        {sym:'一到刷题就烦躁想逃', var:'恢复债 + 情绪负债', text:'前额叶控制下降时，难题会被系统解释成威胁，逃避冲动上升。处理方向是降任务颗粒度，先做可完成题重启控制感。'}
+      ];
+      const diagChoices = $('#diagChoices');
+      const diagResult = $('#diagResult');
+      diagData.forEach((d, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn'; btn.type = 'button'; btn.textContent = d.sym;
+        btn.addEventListener('click', () => {
+          $$('.choice-btn', diagChoices).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          diagResult.innerHTML = `<strong>优先怀疑：${d.var}</strong><br>${d.text}`;
+        });
+        diagChoices.appendChild(btn);
+      });
+
+      // Chain game
+      const correctChain = ['读题','保持条件','调用知识','推理计算','抑制错误','检查修正','写出答案'];
+      const scrambled = ['调用知识','读题','抑制错误','写出答案','保持条件','检查修正','推理计算'];
+      let selectedChain = [];
+      const chainPool = $('#chainPool'), chainSelected = $('#chainSelected'), chainResult = $('#chainResult');
+      function renderChain(){
+        chainPool.innerHTML = '';
+        scrambled.forEach(item => {
+          if(selectedChain.includes(item)) return;
+          const btn = document.createElement('button');
+          btn.className = 'chain-btn'; btn.type = 'button'; btn.textContent = item;
+          btn.addEventListener('click', () => {
+            selectedChain.push(item);
+            renderChain();
+            if(selectedChain.length === correctChain.length) gradeChain();
+            else chainResult.textContent = `已选择 ${selectedChain.length}/7。答案仍隐藏。`;
+          });
+          chainPool.appendChild(btn);
+        });
+        chainSelected.innerHTML = '';
+        selectedChain.forEach((item, idx) => {
+          const slot = document.createElement('span');
+          slot.className = 'chain-slot';
+          slot.textContent = `${idx+1}. ${item}`;
+          chainSelected.appendChild(slot);
+        });
+      }
+      function gradeChain(){
+        const wrong = selectedChain.map((x,i) => x === correctChain[i]).filter(Boolean).length;
+        const perfect = wrong === correctChain.length;
+        chainResult.innerHTML = perfect
+          ? '<strong>排序正确。</strong><br>睡眠不足最容易打断前几段：读题、保持条件、调用知识；也会削弱后段的抑制错误和检查修正。'
+          : `<strong>命中 ${wrong}/7。</strong><br>标准链条：${correctChain.join(' → ')}。睡眠不足不是只让你“困”，而是让条件保持、连续推理和错误监控断裂。`;
+      }
+      $('#resetChain').addEventListener('click', () => { selectedChain = []; renderChain(); chainResult.textContent = '还没有完成排序。'; });
+      renderChain();
+
+      // Defense game
+      const dCanvas = $('#defenseCanvas');
+      const dctx = dCanvas.getContext('2d');
+      const dScore = $('#defenseScore'), dTime = $('#defenseTime'), dState = $('#defenseState'), dExplain = $('#defenseExplain');
+      const badItems = ['手机强光','情绪复盘','晚间高难题','咖啡因','太晚长午睡','焦虑内耗'];
+      const goodItems = ['晨光','低强度散步','20分钟午睡','整理书包','低唤醒过渡'];
+      let game = {running:false, items:[], score:0, time:20, last:0, spawn:0, raf:0};
+      function resizeDefense(){
+        const rect = dCanvas.getBoundingClientRect();
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        dCanvas.width = Math.floor(rect.width*dpr);
+        dCanvas.height = Math.floor(rect.height*dpr);
+        dctx.setTransform(dpr,0,0,dpr,0,0);
+        drawDefense();
+      }
+      function drawPill(ctx, x, y, text, good){
+        ctx.save();
+        ctx.font = '13px ' + getComputedStyle(document.body).fontFamily;
+        const w = Math.min(ctx.measureText(text).width + 30, 150);
+        const h = 34;
+        const r = 17;
+        ctx.fillStyle = good ? 'rgba(93,248,191,.13)' : 'rgba(255,49,95,.13)';
+        ctx.strokeStyle = good ? 'rgba(93,248,191,.62)' : 'rgba(255,49,95,.62)';
+        ctx.shadowColor = good ? 'rgba(93,248,191,.32)' : 'rgba(255,49,95,.32)';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.moveTo(x-w/2+r,y-h/2);
+        ctx.lineTo(x+w/2-r,y-h/2);
+        ctx.quadraticCurveTo(x+w/2,y-h/2,x+w/2,y-h/2+r);
+        ctx.lineTo(x+w/2,y+h/2-r);
+        ctx.quadraticCurveTo(x+w/2,y+h/2,x+w/2-r,y+h/2);
+        ctx.lineTo(x-w/2+r,y+h/2);
+        ctx.quadraticCurveTo(x-w/2,y+h/2,x-w/2,y+h/2-r);
+        ctx.lineTo(x-w/2,y-h/2+r);
+        ctx.quadraticCurveTo(x-w/2,y-h/2,x-w/2+r,y-h/2);
+        ctx.fill();ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = good ? '#d7ffef' : '#ffe2ea';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(text,x,y+1);
+        ctx.restore();
+        return {w,h};
+      }
+      function drawDefense(){
+        const rect = dCanvas.getBoundingClientRect();
+        const w = rect.width, h = rect.height;
+        dctx.clearRect(0,0,w,h);
+        dctx.fillStyle = 'rgba(0,0,0,.10)'; dctx.fillRect(0,0,w,h);
+        dctx.strokeStyle = 'rgba(84,233,255,.10)';
+        for(let x=24;x<w;x+=48){ dctx.beginPath();dctx.moveTo(x,0);dctx.lineTo(x,h);dctx.stroke(); }
+        for(let y=24;y<h;y+=48){ dctx.beginPath();dctx.moveTo(0,y);dctx.lineTo(w,y);dctx.stroke(); }
+        if(!game.running && game.items.length === 0){
+          dctx.fillStyle='rgba(220,235,255,.72)';
+          dctx.font='16px ' + getComputedStyle(document.body).fontFamily;
+          dctx.textAlign='center'; dctx.textBaseline='middle';
+          dctx.fillText('点击“开始 20 秒”后，击落干扰项', w/2, h/2 - 12);
+          dctx.fillStyle='rgba(170,182,199,.72)';
+          dctx.font='13px ' + getComputedStyle(document.body).fontFamily;
+          dctx.fillText('保护项不要点错', w/2, h/2 + 18);
+        }
+        for(const item of game.items){ drawPill(dctx, item.x, item.y, item.text, item.good); }
+      }
+      function spawnItem(){
+        const rect = dCanvas.getBoundingClientRect();
+        const good = Math.random() < .34;
+        const list = good ? goodItems : badItems;
+        const text = list[Math.floor(Math.random()*list.length)];
+        game.items.push({
+          text, good,
+          x: 82 + Math.random()*Math.max(1, rect.width-164),
+          y: -30,
+          vy: 64 + Math.random()*56,
+          w: Math.min(text.length*14 + 34, 150), h:34
+        });
+      }
+      function gameLoop(ts){
+        if(!game.running) return;
+        if(!game.last) game.last = ts;
+        const dt = Math.min((ts - game.last)/1000, .05);
+        game.last = ts;
+        game.spawn -= dt;
+        if(game.spawn <= 0){ spawnItem(); game.spawn = .62 + Math.random()*.38; }
+        const rect = dCanvas.getBoundingClientRect();
+        for(const item of game.items){ item.y += item.vy*dt; }
+        game.items = game.items.filter(item => {
+          if(item.y > rect.height + 40){
+            if(!item.good) game.score -= 1;
+            return false;
+          }
+          return true;
+        });
+        game.time -= dt;
+        if(game.time <= 0){ endGame(); return; }
+        dScore.textContent = game.score;
+        dTime.textContent = Math.ceil(game.time);
+        drawDefense();
+        game.raf = requestAnimationFrame(gameLoop);
+      }
+      function startGame(){
+        game.running = true; game.items = []; game.score = 0; game.time = 20; game.last = 0; game.spawn = .2;
+        dScore.textContent='0'; dTime.textContent='20'; dState.textContent='运行中';
+        dExplain.textContent='正在防守睡眠窗口：击落会推高 A 或扰乱 C 的干扰项，别误伤保护项。';
+        cancelAnimationFrame(game.raf);
+        game.raf = requestAnimationFrame(gameLoop);
+      }
+      function endGame(){
+        game.running = false; cancelAnimationFrame(game.raf); dState.textContent='已结束'; dTime.textContent='0'; drawDefense();
+        const msg = game.score >= 12 ? '防守很好：你优先处理了强光、情绪复盘、高难题和咖啡因这类高唤醒干扰。' : game.score >= 5 ? '中等：已经识别一部分干扰，但仍可能被手机或焦虑内耗突破睡眠窗口。' : '偏低：说明干扰项没有被及时拦截。现实中对应的就是晚上越拖越兴奋，C 被推迟，A 降不下来。';
+        dExplain.innerHTML = `<strong>${msg}</strong><br>高三睡前最重要的是保护低唤醒过渡：让 A 下降，让 C 稳定指向夜间。`;
+      }
+      function hitDefense(clientX, clientY){
+        if(!game.running) return;
+        const rect = dCanvas.getBoundingClientRect();
+        const x = clientX - rect.left, y = clientY - rect.top;
+        for(let i=game.items.length-1;i>=0;i--){
+          const item = game.items[i];
+          if(Math.abs(x-item.x) <= item.w/2 && Math.abs(y-item.y) <= item.h/2){
+            game.items.splice(i,1);
+            game.score += item.good ? -2 : 3;
+            dScore.textContent = game.score;
+            drawDefense();
+            return;
+          }
+        }
+      }
+      dCanvas.addEventListener('pointerdown', e => { e.preventDefault(); hitDefense(e.clientX, e.clientY); });
+      $('#startDefense').addEventListener('click', startGame);
+      $('#stopDefense').addEventListener('click', endGame);
+      window.addEventListener('resize', resizeDefense, {passive:true});
+      setTimeout(resizeDefense, 60);
+
+      // Protocol switcher
+      const protocols = {
+        normal: {name:'正常日', html:'<strong>目标：维持系统并推进复习。</strong><br>夜间保持稳定睡眠；白天优先做可验证任务；晚上不做过强刺激；错题复盘以“能修正”为准，不追求把所有漏洞一晚补完。'},
+        mild: {name:'轻度崩盘', html:'<strong>目标：阻断恶性循环。</strong><br>降低任务难度，先做基础题、短阅读、熟悉题型；午睡可短补；晚上减少手机和情绪复盘。判断标准是当天能恢复一点可控感。'},
+        heavy: {name:'重度崩盘', html:'<strong>目标：保护最低有效输出。</strong><br>停止硬啃难题，优先补睡眠、吃饭、洗漱、整理明天材料；学习只保底：背少量高频点、看模板、做少量基础题。不要用崩盘日定义自己。'},
+        eve: {name:'考前一晚', html:'<strong>目标：减少变量，而不是制造奇迹。</strong><br>不尝试新作息、新饮食、新咖啡因；只做轻量回顾和物品准备；睡不着也不要反复看时间或刷手机，把身体留在低唤醒环境中。'},
+        exam: {name:'考试当天', html:'<strong>目标：稳定调用。</strong><br>按熟悉流程起床、进食、到考场；考前不大量灌新内容；遇到卡题先标记切换，保护后续输出链；每科结束后减少情绪复盘，给下一科保留 A 的稳定。'}
+      };
+      const protocolTabs = $('#protocolTabs'), protocolContent = $('#protocolContent');
+      Object.entries(protocols).forEach(([key, val], idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (idx===0 ? ' active' : ''); btn.type='button'; btn.textContent=val.name;
+        btn.addEventListener('click', () => {
+          $$('.tab-btn', protocolTabs).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          protocolContent.innerHTML = val.html;
+        });
+        protocolTabs.appendChild(btn);
+      });
+      protocolContent.innerHTML = protocols.normal.html;
+
+      // In-view subtle reveal
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){ entry.target.style.transform='translateY(0)'; entry.target.style.opacity='1'; io.unobserve(entry.target); }
+        });
+      }, {threshold:.08});
+      $$('.chapter').forEach(ch => { ch.style.opacity='.001'; ch.style.transform='translateY(18px)'; ch.style.transition='opacity .5s ease, transform .5s ease'; io.observe(ch); });
+
+      console.log(BUILD, 'ready');
+    })();
+  </script>
+
+  <!--
+  自检清单：
+  1. 打开页面后确认源码中存在 BUILD_V10_REAL_REWRITE。
+  2. 手机端首页首屏能看到标题、作者、开始阅读正文、打开目录；页面可直接上下滚动。
+  3. 右下角没有向上箭头和闪电按钮；音乐按钮只在右上角，以 bgm.mp3 为音源，无文件时静默失败。
+  4. 点击“目录”打开左侧侧边栏；点击 00–09 任意章节后准确跳转并自动关闭侧边栏。
+  5. S/C/A 调参实验室拖动三个滑杆，入睡概率和解释实时变化。
+  6. 睡眠故障诊断点击任意症状，结果不为空，并显示优先怀疑变量与机制解释。
+  7. 考试输出链小游戏在未点满 7 步前不显示标准答案；点满后才显示反馈。
+  8. 睡眠窗口防守小游戏点击开始后有掉落项；手机触摸可击落；可计分、倒计时、结束并显示解释。
+  9. 协议切换器点击正常日/轻度崩盘/重度崩盘/考前一晚/考试当天，内容均不为空。
+  10. 仅使用 HTML + CSS + JavaScript，无 React、npm、后端依赖，可直接上传 GitHub Pages。
+  -->
+</body>
+</html>
