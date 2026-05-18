@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>高三睡眠系统档案｜希望中的林木</title>
+  <meta name="description" content="高三通用版睡眠系统档案：从第一性原理推导睡眠、学习与考试输出。作者：希望中的林木。" />
+  <style>
+    :root{
+      --bg:#050806;
+      --bg2:#0b100c;
+      --paper:#0d130e;
+      --paper2:#11190f;
+      --ink:#f3efe0;
+      --muted:#b5ad95;
+      --dim:#78705a;
+      --gold:#d8b967;
+      --gold2:#f0d589;
+      --green:#9db97b;
+      --danger:#d87a68;
+      --blue:#9cc7e8;
+      --line:rgba(216,185,103,.27);
+      --line2:rgba(255,255,255,.09);
+      --shadow:0 28px 80px rgba(0,0,0,.52);
+      --radius:28px;
+      --serif: "Songti SC", "STSong", "Noto Serif CJK SC", "SimSun", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg);}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);font-family:var(--sans);line-height:1.88;
+      background:
+        radial-gradient(circle at 14% 5%, rgba(216,185,103,.13), transparent 34%),
+        radial-gradient(circle at 82% 12%, rgba(90,130,80,.10), transparent 36%),
+        radial-gradient(circle at 50% 95%, rgba(216,185,103,.08), transparent 45%),
+        linear-gradient(180deg,#050806,#0b0f0a 42%,#050806);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.31;mix-blend-mode:screen;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.38'/%3E%3C/svg%3E");
+    }
+    body::after{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+      background:
+        linear-gradient(90deg, rgba(216,185,103,.18) 0 1px, transparent 1px calc(100% - 1px), rgba(216,185,103,.18) calc(100% - 1px)),
+        radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,.52));
+      margin:0 clamp(10px,4vw,56px);
+    }
+    a{color:inherit}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    #particleCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.88}
+    .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),#fff1ad);width:0;z-index:40;box-shadow:0 0 18px rgba(216,185,103,.62)}
+    .topbar{
+      position:fixed;top:14px;left:clamp(12px,3vw,32px);right:clamp(12px,3vw,32px);z-index:50;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;pointer-events:none;
+    }
+    .topbar button,.topbar .chapter-indicator{pointer-events:auto}
+    .pill{
+      border:1px solid rgba(216,185,103,.36);background:rgba(5,8,6,.76);color:var(--ink);
+      backdrop-filter:blur(18px);border-radius:999px;padding:10px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25);
+      letter-spacing:.08em;
+    }
+    .menuBtn{min-width:88px;text-align:center}
+    .chapter-indicator{color:var(--muted);font-size:14px;display:flex;align-items:center;gap:9px;max-width:42vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chapter-indicator b{color:var(--ink);font-family:var(--mono);font-weight:600;letter-spacing:.2em}
+    .audioBtn{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;padding:0;position:relative;overflow:hidden}
+    .audioBtn::before{content:"";position:absolute;inset:12px;border-radius:50%;background:conic-gradient(from 0deg, #1b1608, var(--gold), #fff2b4, #786027, #1b1608);opacity:.78;animation:spin 8s linear infinite paused}
+    .audioBtn.playing::before{animation-play-state:running}
+    .audioBtn span{position:relative;z-index:1;font-size:18px;text-shadow:0 1px 2px #000}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .wrap{position:relative;z-index:3;width:min(1120px,100%);margin:0 auto;padding:0 clamp(18px,4vw,56px)}
+    .hero{min-height:100vh;display:grid;align-items:center;padding:110px 0 80px;position:relative}
+    .hero-card{
+      border-left:1px solid var(--line);border-right:1px solid var(--line);padding:clamp(34px,8vw,86px) clamp(24px,7vw,84px);
+      background:linear-gradient(90deg,rgba(216,185,103,.05),rgba(255,255,255,.02),rgba(216,185,103,.035));
+      position:relative;box-shadow:var(--shadow);overflow:hidden;border-radius:2px;
+    }
+    .hero-card::before,.hero-card::after{content:"";position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.55}
+    .hero-card::before{top:0}.hero-card::after{bottom:0}
+    .archive-kicker{font-family:var(--mono);letter-spacing:.52em;text-transform:uppercase;color:var(--gold);font-size:clamp(11px,2vw,14px);opacity:.85;margin-bottom:24px}
+    h1{
+      font-family:var(--serif);font-size:clamp(58px,13vw,132px);line-height:1.02;margin:0 0 26px;letter-spacing:.02em;font-weight:900;
+      text-shadow:0 0 24px rgba(216,185,103,.12),0 10px 40px rgba(0,0,0,.42);
+    }
+    .hero-sub{font-family:var(--serif);font-size:clamp(21px,4vw,36px);line-height:1.9;color:#e7dfc7;max-width:850px;margin:0 0 32px}
+    .hero-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:38px 0 34px;max-width:780px}
+    .meta-box{border:1px solid rgba(216,185,103,.22);border-radius:22px;background:rgba(0,0,0,.22);padding:18px 20px;color:var(--muted)}
+    .meta-box b{display:block;color:var(--gold);font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;margin-bottom:8px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:10px}
+    .btn{
+      border:1px solid rgba(216,185,103,.45);background:rgba(216,185,103,.08);color:var(--ink);border-radius:999px;padding:13px 22px;letter-spacing:.1em;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 8px 30px rgba(0,0,0,.18);transition:.25s ease;
+    }
+    .btn:hover{background:rgba(216,185,103,.16);transform:translateY(-1px)}
+    .btn.primary{background:linear-gradient(135deg,rgba(216,185,103,.26),rgba(216,185,103,.07));color:#fff5c9}
+    .hint{color:var(--dim);font-size:13px;max-width:610px}
+    .menuOverlay{position:fixed;inset:0;z-index:80;background:rgba(2,4,3,.86);backdrop-filter:blur(22px);display:none;padding:80px 18px 40px;overflow:auto}
+    .menuOverlay.open{display:block;animation:fadeIn .25s ease both}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .menuPanel{width:min(980px,100%);margin:0 auto;border:1px solid rgba(216,185,103,.32);border-radius:34px;background:linear-gradient(180deg,rgba(15,22,14,.94),rgba(6,8,6,.94));padding:clamp(22px,5vw,42px);box-shadow:var(--shadow)}
+    .menuHeader{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+    .menuHeader h2{font-family:var(--serif);font-size:clamp(30px,6vw,54px);margin:0}
+    .chapterGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .chapterTile{border:1px solid rgba(216,185,103,.22);border-radius:24px;background:rgba(255,255,255,.035);padding:18px;text-align:left;color:var(--ink);transition:.25s ease;min-height:150px}
+    .chapterTile:hover{transform:translateY(-4px);background:rgba(216,185,103,.08);border-color:rgba(216,185,103,.48)}
+    .chapterTile .num{font-family:var(--mono);color:var(--gold);letter-spacing:.18em;font-size:12px;margin-bottom:14px}.chapterTile h3{font-size:19px;margin:0 0 8px}.chapterTile p{font-size:13px;color:var(--muted);margin:0;line-height:1.7}
+    main{position:relative;z-index:3;padding-bottom:80px}
+    .chapter{min-height:82vh;padding:110px 0 70px;border-top:1px solid rgba(216,185,103,.14);position:relative}
+    .chapter-head{display:grid;grid-template-columns:120px 1fr;gap:28px;align-items:start;margin-bottom:36px}
+    .chapter-num{font-family:var(--mono);color:var(--gold);font-size:18px;letter-spacing:.25em;position:sticky;top:102px}
+    .chapter-title{margin:0;font-family:var(--serif);font-size:clamp(38px,8vw,86px);line-height:1.1}.chapter-label{font-family:var(--mono);color:var(--gold);letter-spacing:.45em;text-transform:uppercase;font-size:12px;margin-bottom:15px}
+    .thesis{font-family:var(--serif);font-size:clamp(24px,4.6vw,42px);line-height:1.65;color:#eee6cf;margin:18px 0 22px;border-left:2px solid var(--gold);padding-left:24px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .card{border:1px solid rgba(216,185,103,.22);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));padding:24px;box-shadow:0 16px 46px rgba(0,0,0,.20);position:relative;overflow:hidden}
+    .card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(216,185,103,.09),transparent 38%);opacity:.8;pointer-events:none}
+    .card>*{position:relative}.card h3{margin:0 0 12px;font-size:22px}.card p,.card li{color:var(--muted)}
+    .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+    .quote{font-family:var(--serif);font-size:clamp(28px,5vw,54px);line-height:1.42;margin:44px 0;padding:42px;border:1px solid rgba(216,185,103,.24);border-radius:34px;background:rgba(216,185,103,.055);color:#fff0c8;position:relative}
+    .quote::before{content:"“";position:absolute;top:-26px;left:26px;font-size:92px;color:rgba(216,185,103,.28)}
+    .chain{display:grid;gap:10px;margin:20px 0}.chain-step{border:1px solid rgba(216,185,103,.22);background:rgba(0,0,0,.18);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}.chain-step b{color:var(--gold);font-family:var(--mono)}
+    .miniBtn{border:1px solid rgba(216,185,103,.28);background:rgba(0,0,0,.18);color:var(--ink);border-radius:14px;padding:8px 12px;font-size:14px}.miniBtn.active,.miniBtn:hover{background:rgba(216,185,103,.16);border-color:rgba(216,185,103,.55)}
+    .reveal{opacity:0;transform:translateY(22px);filter:blur(4px);transition:opacity .65s ease,transform .65s ease,filter .65s ease}.reveal.in{opacity:1;transform:none;filter:none}.stagger .reveal:nth-child(2){transition-delay:.1s}.stagger .reveal:nth-child(3){transition-delay:.2s}.stagger .reveal:nth-child(4){transition-delay:.3s}.stagger .reveal:nth-child(5){transition-delay:.4s}
+    .type-lines .line{display:block;opacity:0;transform:translateY(12px);filter:blur(5px);transition:.58s ease}.type-lines.in .line{opacity:1;transform:none;filter:none}.type-lines .line:nth-child(2){transition-delay:.11s}.type-lines .line:nth-child(3){transition-delay:.22s}.type-lines .line:nth-child(4){transition-delay:.33s}.type-lines .line:nth-child(5){transition-delay:.44s}
+    .interactive{border:1px solid rgba(216,185,103,.34);border-radius:34px;background:linear-gradient(180deg,rgba(14,22,12,.95),rgba(6,9,6,.95));padding:clamp(22px,4vw,34px);margin:32px 0;box-shadow:var(--shadow)}
+    .interactive h3{font-family:var(--serif);font-size:clamp(28px,5vw,44px);margin:0 0 8px}.interactive .desc{color:var(--muted);margin:0 0 22px}
+    .labRows{display:grid;gap:15px}.sliderRow{display:grid;grid-template-columns:120px 1fr 56px;gap:12px;align-items:center}.sliderRow label{color:var(--gold);font-family:var(--mono);letter-spacing:.1em}.sliderRow input{width:100%;accent-color:var(--gold)}.valueBox{font-family:var(--mono);color:#fff;text-align:right}
+    .meter{height:18px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(216,185,103,.18);margin:18px 0}.meterFill{height:100%;width:0;background:linear-gradient(90deg,#6d8b57,var(--gold),#fff2a8);box-shadow:0 0 22px rgba(216,185,103,.42);transition:.35s ease}
+    .outputBox{border:1px solid rgba(216,185,103,.24);border-radius:22px;padding:18px;background:rgba(0,0,0,.22);color:var(--muted)}.outputBox b{color:var(--ink)}
+    .quizStage{min-height:250px}.scenario{font-family:var(--serif);font-size:clamp(22px,4vw,34px);line-height:1.55;margin:12px 0 20px}.choices{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.choice{border:1px solid rgba(216,185,103,.28);background:rgba(216,185,103,.05);color:var(--ink);border-radius:999px;padding:10px 15px}.choice.correct{background:rgba(88,164,104,.26);border-color:rgba(136,224,152,.55)}.choice.wrong{background:rgba(216,110,92,.20);border-color:rgba(216,110,92,.55)}
+    .feedback{border-left:2px solid var(--gold);padding:14px 16px;background:rgba(216,185,103,.06);color:var(--muted);min-height:64px}.feedback b{color:var(--gold)}
+    .gameBoard{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.nodeBtn{padding:16px;border-radius:20px;border:1px solid rgba(216,185,103,.24);background:rgba(255,255,255,.035);color:var(--ink);text-align:left;transition:.2s}.nodeBtn.done{opacity:.45;text-decoration:line-through}.nodeBtn.flash{border-color:var(--gold);box-shadow:0 0 18px rgba(216,185,103,.25)}
+    .termCloud{display:flex;flex-wrap:wrap;gap:10px}.term{border:1px solid rgba(216,185,103,.25);border-radius:999px;padding:9px 13px;background:rgba(0,0,0,.16);color:var(--ink)}.term.active{background:rgba(216,185,103,.16);border-color:rgba(216,185,103,.58)}.termPanel{margin-top:16px;border-radius:20px;border:1px solid rgba(216,185,103,.22);padding:18px;background:rgba(0,0,0,.2);color:var(--muted)}
+    .protocolTabs{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}.protocolBody{border:1px solid rgba(216,185,103,.22);border-radius:24px;background:rgba(0,0,0,.18);padding:22px}.protocolBody h4{margin:0 0 10px;color:var(--gold);font-size:22px}.protocolBody ul{margin:0;padding-left:20px;color:var(--muted)}
+    .miniGameHUD{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-family:var(--mono)}
+    .floatWord{position:absolute;z-index:8;user-select:none;border:1px solid rgba(216,185,103,.28);border-radius:999px;padding:8px 12px;background:rgba(0,0,0,.42);backdrop-filter:blur(10px);font-size:14px;color:var(--ink);transition:.18s;animation:floaty 8s linear infinite}.floatWord.good{color:#dff7c0}.floatWord.bad{color:#ffb3a7}@keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-28px)}100%{transform:translateY(0)}}
+    .table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:20px;display:table}.table th,.table td{border:1px solid rgba(216,185,103,.18);padding:14px;text-align:left;color:var(--muted)}.table th{color:var(--gold);background:rgba(216,185,103,.06)}
+    .footer{border-top:1px solid rgba(216,185,103,.2);padding:40px 0 80px;color:var(--dim);font-size:13px;text-align:center}
+    @media (max-width:760px){
+      .topbar{top:10px;left:12px;right:12px}.menuBtn{min-width:auto}.chapter-indicator{font-size:12px;max-width:38vw}.audioBtn{width:48px;height:48px}
+      .hero-card{padding:88px 24px 34px}h1{font-size:clamp(54px,17vw,86px)}.hero-meta{grid-template-columns:1fr}.chapterGrid,.grid2,.grid3,.gameBoard{grid-template-columns:1fr}.chapter-head{grid-template-columns:1fr;gap:12px}.chapter-num{position:static}.chapter{padding:86px 0 54px}.quote{padding:30px 22px}.sliderRow{grid-template-columns:1fr}.valueBox{text-align:left}.table{font-size:13px}
+    }
+  </style>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+<div class="progress" id="progress"></div>
+<header class="topbar">
+  <button class="pill menuBtn" id="openMenu">目录</button>
+  <div class="chapter-indicator"><b id="chapterNo">00</b><span id="chapterName">封面</span></div>
+  <button class="pill audioBtn" id="audioBtn" aria-label="音乐开关"><span id="audioIcon">♪</span></button>
+</header>
+
+<div class="menuOverlay" id="menuOverlay">
+  <div class="menuPanel">
+    <div class="menuHeader"><h2>档案目录</h2><button class="btn" id="closeMenu">关闭</button></div>
+    <div class="chapterGrid" id="chapterGrid"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero" id="hero" data-title="封面" data-no="00">
+    <div class="hero-card stagger">
+      <div class="archive-kicker reveal">SENIOR THREE EDITION · SLEEP SYSTEM ARCHIVE</div>
+      <h1 class="reveal">高三睡眠系统<br/>档案</h1>
+      <p class="hero-sub type-lines reveal">
+        <span class="line">不是少学一小时，而是保住第二天的有效输出。</span>
+        <span class="line">睡眠不是学习的敌人，而是注意力、记忆提取、错误监控和情绪稳定的底层维护程序。</span>
+      </p>
+      <div class="hero-meta reveal">
+        <div class="meta-box"><b>AUTHOR</b>希望中的林木</div>
+        <div class="meta-box"><b>VERSION</b>Awakening Archive · v3</div>
+        <div class="meta-box"><b>MUSIC</b>原创 WebAudio 觉醒旋律</div>
+      </div>
+      <div class="hero-actions reveal">
+        <button class="btn primary" id="startRead">开始阅读 →</button>
+        <button class="btn" id="startQuiz">先做诊断</button>
+        <p class="hint">提示：手机浏览器通常不允许无交互自动播放音乐。第一次点击“开始阅读”或音乐按钮后，右上角唱片会控制音乐开关。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<main class="wrap" id="content">
+  <section class="chapter" id="chapter-00" data-no="00" data-title="编者按">
+    <div class="chapter-head">
+      <div class="chapter-num">00</div>
+      <div>
+        <div class="chapter-label reveal">PREFACE</div>
+        <h2 class="chapter-title reveal">编者按</h2>
+        <p class="thesis type-lines reveal"><span class="line">这不是一篇“早点睡”的劝告。</span><span class="line">它是一份高三学生能用的睡眠系统说明书。</span></p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card reveal"><span class="tag">Why</span><h3>为什么要做成系统？</h3><p>因为高考前最危险的不是单晚少睡一点，而是把睡眠、注意力、手机刺激、情绪、低级错误连成一个失控循环。系统的价值，是让你知道问题坏在什么变量上。</p></div>
+      <div class="card reveal"><span class="tag">Rule</span><h3>这份档案的读法</h3><p>先看每章大句，再点开互动。不要把它当科普收藏，而要把它当作“状态控制台”：你困、烦、读不进、睡不着时，用它排错。</p></div>
+    </div>
+    <p class="quote reveal">高三不是只拼时长。高三拼的是：在固定时间内，让神经系统保持可调用。</p>
+  </section>
+
+  <section class="chapter" id="chapter-01" data-no="01" data-title="底层公理">
+    <div class="chapter-head"><div class="chapter-num">01</div><div><div class="chapter-label reveal">FIRST PRINCIPLE</div><h2 class="chapter-title reveal">为什么必须睡眠</h2><p class="thesis type-lines reveal"><span class="line">生命不是自然稳定的物体。</span><span class="line">它必须持续消耗能量，把自己维持在一个不自然但可运行的有序状态。</span></p></div></div>
+    <div class="grid3">
+      <div class="card reveal"><span class="tag">Energy</span><h3>能量负债</h3><p>神经元放电后要恢复离子梯度，钠钾泵消耗 ATP。清醒学习越久，高精度信号处理成本越高。</p></div>
+      <div class="card reveal"><span class="tag">Synapse</span><h3>突触负债</h3><p>学习会改变连接权重。白天不只强化正确知识，也会留下噪声、半懂片段和错误路径。</p></div>
+      <div class="card reveal"><span class="tag">Emotion</span><h3>情绪负债</h3><p>压力、失败、焦虑会占用控制资源。睡眠参与情绪记忆再处理，让第二天不被前一天的噪声拖住。</p></div>
+    </div>
+    <div class="chain reveal">
+      <div class="chain-step"><b>01</b><span>清醒学习 = 对外界持续开放 + 高成本信息处理。</span></div>
+      <div class="chain-step"><b>02</b><span>高成本处理会产生能量、突触、代谢和情绪账单。</span></div>
+      <div class="chain-step"><b>03</b><span>睡眠 = 低外界响应 + 高内部维护。它不是关机，是夜间维修。</span></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="chapter-02" data-no="02" data-title="三控制器">
+    <div class="chapter-head"><div class="chapter-num">02</div><div><div class="chapter-label reveal">S · C · A MODEL</div><h2 class="chapter-title reveal">睡眠三控制器</h2><p class="thesis type-lines reveal"><span class="line">入睡不是一个按钮。</span><span class="line">它由睡眠压力 S、昼夜节律 C、觉醒系统 A 共同决定。</span></p></div></div>
+    <div class="interactive reveal" id="lab">
+      <h3>互动实验室：自己调一次 S / C / A</h3>
+      <p class="desc">拖动滑块，观察“入睡概率”和“恢复质量”怎么变化。这里的数字不是医学测量，而是帮助你建立变量直觉。</p>
+      <div class="labRows">
+        <div class="sliderRow"><label>S 压力</label><input id="sVal" type="range" min="0" max="100" value="70"><span class="valueBox" id="sTxt">70</span></div>
+        <div class="sliderRow"><label>C 节律</label><input id="cVal" type="range" min="0" max="100" value="78"><span class="valueBox" id="cTxt">78</span></div>
+        <div class="sliderRow"><label>A 觉醒</label><input id="aVal" type="range" min="0" max="100" value="35"><span class="valueBox" id="aTxt">35</span></div>
+        <div class="sliderRow"><label>结构</label><input id="stVal" type="range" min="0" max="100" value="80"><span class="valueBox" id="stTxt">80</span></div>
+        <div class="sliderRow"><label>身体</label><input id="bVal" type="range" min="0" max="100" value="84"><span class="valueBox" id="bTxt">84</span></div>
+      </div>
+      <div class="meter"><div class="meterFill" id="sleepMeter"></div></div>
+      <div class="outputBox" id="labOutput"></div>
+    </div>
+    <div class="grid3">
+      <div class="card reveal"><h3>S：睡眠压力</h3><p>醒得越久、消耗越多，S 越高。午睡会降低 S；咖啡因不是清债，只是暂时屏蔽困意信号。</p></div>
+      <div class="card reveal"><h3>C：昼夜节律</h3><p>由光照、起床、进食和活动锚定。白天困晚上精神，常常是 C 后移。</p></div>
+      <div class="card reveal"><h3>A：觉醒系统</h3><p>压力、情绪、高刺激、强光和难题会提高 A。很困但睡不着，常是 A 没降。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="chapter-03" data-no="03" data-title="睡眠结构">
+    <div class="chapter-head"><div class="chapter-num">03</div><div><div class="chapter-label reveal">NREM · REM</div><h2 class="chapter-title reveal">睡眠结构</h2><p class="thesis type-lines reveal"><span class="line">睡眠不是一整块“休息时间”。</span><span class="line">它是 N1、N2、N3 和 REM 组成的多阶段维护程序。</span></p></div></div>
+    <div class="grid2">
+      <div class="card reveal"><h3>N2：睡眠稳定器</h3><p>睡眠纺锤波和 K-complex 帮助过滤外界刺激，并参与记忆整合。浅睡不等于没用。</p></div>
+      <div class="card reveal"><h3>N3：深度维护</h3><p>慢波睡眠承担高优先级偿债：突触降噪、能量恢复、部分身体修复和记忆巩固。</p></div>
+      <div class="card reveal"><h3>REM：情绪再加工</h3><p>REM 像一个低外界威胁的内部模拟环境，参与情绪记忆降敏、联想和部分整合。</p></div>
+      <div class="card reveal"><h3>连续性：比躺多久更重要</h3><p>频繁夜醒会打断阶段推进。躺够 9 小时，不代表睡眠结构完整。</p></div>
+    </div>
+    <p class="quote reveal">睡眠周期不是迷信分钟，而是为了保护维护程序的完整推进。</p>
+  </section>
+
+  <section class="chapter" id="chapter-04" data-no="04" data-title="考试输出链">
+    <div class="chapter-head"><div class="chapter-num">04</div><div><div class="chapter-label reveal">EXAM OUTPUT</div><h2 class="chapter-title reveal">睡眠如何决定考试输出</h2><p class="thesis type-lines reveal"><span class="line">高考不是只考知识库存。</span><span class="line">它考的是高压、限时、连续任务下的稳定调用能力。</span></p></div></div>
+    <div class="interactive reveal">
+      <h3>小游戏：把考试输出链排对</h3>
+      <p class="desc">从第一步开始点击。点错会提示你为什么这一步不能提前。目标是让你知道：睡眠损害的不是一个点，而是一条加工链。</p>
+      <div class="miniGameHUD"><span>当前需要：<b id="nextNeed">看见题目</b></span><span>得分：<b id="chainScore">0</b>/7</span></div>
+      <div class="gameBoard" id="chainGame"></div>
+      <div class="feedback" id="chainFeedback">点击“看见题目”开始。</div>
+    </div>
+    <div class="grid3">
+      <div class="card reveal"><h3>注意力</h3><p>睡眠不足会造成 lapse：眼睛睁着，但处理瞬间掉线。漏“不正确的是”、漏单位、漏转折词，常来自这里。</p></div>
+      <div class="card reveal"><h3>工作记忆</h3><p>前额叶降级时，题干条件、公式、中间结果放不稳。会的题也可能中途断链。</p></div>
+      <div class="card reveal"><h3>错误监控</h3><p>ACC 与前额叶状态下降后，错了不觉得怪，检查失效。本该拿的分最容易在这里漏掉。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="chapter-05" data-no="05" data-title="作息参数">
+    <div class="chapter-head"><div class="chapter-num">05</div><div><div class="chapter-label reveal">PARAMETER</div><h2 class="chapter-title reveal">从机制推出作息参数</h2><p class="thesis type-lines reveal"><span class="line">所有作息参数，本质上都是在调 S、C、A，保护睡眠结构。</span></p></div></div>
+    <div class="interactive reveal">
+      <h3>关灯时间计算器</h3>
+      <p class="desc">输入起床时间和周期长度。高三通用默认周期可用 90 分钟；你也可以自己改。</p>
+      <div class="grid3">
+        <div class="card"><label>起床时间<br><input id="wakeTime" type="time" value="06:20" style="width:100%;margin-top:8px;background:#0a0f0b;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px"></label></div>
+        <div class="card"><label>周期分钟<br><input id="cycleMin" type="number" min="70" max="110" value="90" style="width:100%;margin-top:8px;background:#0a0f0b;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px"></label></div>
+        <div class="card"><label>入睡缓冲<br><input id="bufferMin" type="number" min="0" max="60" value="20" style="width:100%;margin-top:8px;background:#0a0f0b;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:10px"></label></div>
+      </div>
+      <button class="btn primary" id="calcSleep" style="margin-top:16px">计算关灯时间</button>
+      <div class="outputBox" id="sleepCalcOut" style="margin-top:16px"></div>
+    </div>
+    <div class="interactive reveal" id="napBox">
+      <h3>午睡决策器</h3><p class="desc">选择你现在的状态，系统给出午睡长度。</p>
+      <div class="choices" id="napChoices"></div><div class="feedback" id="napFeedback">选择状态。</div>
+    </div>
+  </section>
+
+  <section class="chapter" id="chapter-06" data-no="06" data-title="故障诊断">
+    <div class="chapter-head"><div class="chapter-num">06</div><div><div class="chapter-label reveal">DIAGNOSIS</div><h2 class="chapter-title reveal">睡眠故障诊断系统</h2><p class="thesis type-lines reveal"><span class="line">不要只问“我为什么困”。</span><span class="line">要问：是哪一个变量坏了？</span></p></div></div>
+    <div class="interactive reveal" id="quizBox">
+      <h3>选择题诊断：你来判断坏掉的变量</h3>
+      <p class="desc">这不是背答案，而是训练第一性原理判断：症状 → 变量 → 机制 → 修复动作。</p>
+      <div class="quizStage"><div class="miniGameHUD"><span>题目：<b id="qNum">1</b>/8</span><span>正确：<b id="qScore">0</b></span></div><div class="scenario" id="scenarioText"></div><div class="choices" id="quizChoices"></div><div class="feedback" id="quizFeedback">选择一个变量。</div><button class="btn" id="nextQuiz" style="margin-top:14px">下一题</button></div>
+    </div>
+    <div class="card reveal"><h3>总公式</h3><p><b style="color:var(--gold)">睡眠效果 = S × C × A × Structure × Body × Output</b></p><p>任何一项坏了，你都可能“睡了但没恢复”。诊断的目标不是自责，而是找到最小修复动作。</p></div>
+  </section>
+
+  <section class="chapter" id="chapter-07" data-no="07" data-title="高三运行协议">
+    <div class="chapter-head"><div class="chapter-num">07</div><div><div class="chapter-label reveal">PROTOCOL</div><h2 class="chapter-title reveal">高三睡眠运行协议</h2><p class="thesis type-lines reveal"><span class="line">目标不是完美养生。</span><span class="line">目标是用最小成本，保护考试级输出。</span></p></div></div>
+    <div class="interactive reveal">
+      <h3>协议切换器</h3><p class="desc">选择当前状态。每个协议都给出“当日主目标”和“禁止动作”。</p>
+      <div class="protocolTabs" id="protocolTabs"></div><div class="protocolBody" id="protocolBody"></div>
+    </div>
+    <div class="interactive reveal" id="catchGame">
+      <h3>小游戏：抢回睡眠窗口</h3>
+      <p class="desc">点击会破坏睡眠窗口的红色刺激词，避开绿色修复词。20 秒内尽量把 A 降下来。</p>
+      <div class="miniGameHUD"><span>剩余：<b id="catchTime">20</b>s</span><span>A 觉醒：<b id="arousalScore">70</b></span><button class="miniBtn" id="catchStart">开始</button></div>
+      <div id="catchArea" style="height:310px;border:1px solid rgba(216,185,103,.2);border-radius:26px;margin-top:16px;position:relative;overflow:hidden;background:rgba(0,0,0,.14)"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="chapter-08" data-no="08" data-title="总控表">
+    <div class="chapter-head"><div class="chapter-num">08</div><div><div class="chapter-label reveal">CONTROL TABLE</div><h2 class="chapter-title reveal">一页总控表</h2><p class="thesis type-lines reveal"><span class="line">睡眠不是学习的敌人。</span><span class="line">它是第二天有效学习时间、考场输出精度和情绪稳定性的底层系统。</span></p></div></div>
+    <div class="grid2">
+      <div class="card reveal"><h3>最核心的操作</h3><ul><li>多数高三生：优先守住 8 小时以上的睡眠窗口。</li><li>固定起床，早晨见光。</li><li>轻困短午睡，崩盘才睡完整周期。</li><li>睡前 60 分钟降低 A，不做高唤醒任务。</li><li>考前不实验，不新引入刺激物。</li></ul></div>
+      <div class="card reveal"><h3>输出指标</h3><ul><li>读题能否一次进脑。</li><li>英语是否成句成段。</li><li>低级错是否减少。</li><li>下午是否断片。</li><li>情绪是否更稳。</li><li>检查是否能发现错。</li></ul></div>
+    </div>
+    <p class="quote reveal">高考前最危险的不是少学一小时，而是用一小时低质量熬夜，换来第二天多个小时的系统降级。</p>
+  </section>
+</main>
+<footer class="wrap footer">© 希望中的林木 · 高三睡眠系统档案 · 原创 WebAudio 旋律与交互式系统页面</footer>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const chapters=[
+    ['00','编者按','这不是“早点睡”的劝告，而是睡眠系统说明书。','#chapter-00'],
+    ['01','底层公理','生命是开放系统，清醒会积累维护负债。','#chapter-01'],
+    ['02','三控制器','S 睡眠压力、C 昼夜节律、A 觉醒系统。','#chapter-02'],
+    ['03','睡眠结构','N1、N2、N3、REM 是不同维护程序。','#chapter-03'],
+    ['04','考试输出链','高考考的是稳定调用能力，不只是库存。','#chapter-04'],
+    ['05','作息参数','把机制推导成夜间、午睡、光照、运动规则。','#chapter-05'],
+    ['06','故障诊断','用 S/C/A/Structure/Body/Output 排错。','#chapter-06'],
+    ['07','运行协议','正常日、崩盘日、考前与考试当天策略。','#chapter-07'],
+    ['08','总控表','把系统压缩成一页可执行规则。','#chapter-08']
+  ];
+  const grid=$('#chapterGrid');
+  chapters.forEach(c=>{const b=document.createElement('button');b.className='chapterTile';b.innerHTML=`<div class="num">${c[0]}</div><h3>${c[1]}</h3><p>${c[2]}</p>`;b.onclick=()=>{closeMenu(); unlockAudio(); document.querySelector(c[3]).scrollIntoView({behavior:'smooth'});};grid.appendChild(b);});
+  function openMenu(){ $('#menuOverlay').classList.add('open'); unlockAudio();}
+  function closeMenu(){ $('#menuOverlay').classList.remove('open');}
+  $('#openMenu').onclick=openMenu; $('#closeMenu').onclick=closeMenu;
+  $('#startRead').onclick=()=>{unlockAudio();$('#chapter-00').scrollIntoView({behavior:'smooth'});};
+  $('#startQuiz').onclick=()=>{unlockAudio();$('#chapter-06').scrollIntoView({behavior:'smooth'});};
+
+  // reveal / chapter indicator
+  const revObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in'); if(e.target.classList.contains('type-lines')) e.target.classList.add('in');}}),{threshold:.12});
+  $$('.reveal,.type-lines').forEach(el=>revObs.observe(el));
+  const chObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){$('#chapterNo').textContent=e.target.dataset.no;$('#chapterName').textContent=e.target.dataset.title;}}),{threshold:.45});
+  $$('.chapter,#hero').forEach(el=>chObs.observe(el));
+  addEventListener('scroll',()=>{const h=document.documentElement;$('#progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+
+  // particles
+  const canvas=$('#particleCanvas'), ctx=canvas.getContext('2d'); let W,H,particles=[],mouse={x:-999,y:-999};
+  function resize(){W=canvas.width=innerWidth*devicePixelRatio;H=canvas.height=innerHeight*devicePixelRatio;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';makeParticles();}
+  function makeParticles(){const n=Math.min(150,Math.floor(innerWidth*innerHeight/7800));particles=Array.from({length:n},(_,i)=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28*devicePixelRatio,vy:(Math.random()-.5)*.28*devicePixelRatio,r:(Math.random()*1.7+0.4)*devicePixelRatio,a:Math.random()*0.55+0.15,kind:i%7===0?'glyph':'dot',g:['S','C','A','REM','N3','ATP','PFC'][i%7]}));}
+  function burst(x,y){for(let i=0;i<24;i++)particles.push({x:x*devicePixelRatio,y:y*devicePixelRatio,vx:(Math.random()-.5)*3*devicePixelRatio,vy:(Math.random()-.5)*3*devicePixelRatio,r:(Math.random()*2+1)*devicePixelRatio,a:.9,life:70,kind:'dot'});}
+  addEventListener('mousemove',e=>{mouse.x=e.clientX*devicePixelRatio;mouse.y=e.clientY*devicePixelRatio}); addEventListener('click',e=>burst(e.clientX,e.clientY)); addEventListener('resize',resize); resize();
+  function drawParticles(){ctx.clearRect(0,0,W,H);for(const p of particles){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;if(p.life){p.life--;p.a*=.985}ctx.globalAlpha=Math.max(0,p.a);ctx.fillStyle='#d8b967';if(p.kind==='glyph'){ctx.font=`${10*devicePixelRatio}px monospace`;ctx.fillText(p.g,p.x,p.y)}else{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()} const dx=p.x-mouse.x,dy=p.y-mouse.y,d=Math.hypot(dx,dy); if(d<150*devicePixelRatio){ctx.globalAlpha=(1-d/(150*devicePixelRatio))*.16;ctx.strokeStyle='#d8b967';ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();}} particles=particles.filter(p=>!p.life||p.life>1);ctx.globalAlpha=1;requestAnimationFrame(drawParticles)}drawParticles();
+
+  // WebAudio: cinematic awakening original loop
+  let audioCtx, master, isPlaying=false, schedTimer, nextNoteTime=0, step=0; const tempo=78, stepDur=60/tempo/2;
+  function makeGain(v){const g=audioCtx.createGain();g.gain.value=v;return g}
+  function unlockAudio(){ if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)(); master=makeGain(.62); master.connect(audioCtx.destination);} if(audioCtx.state==='suspended') audioCtx.resume(); if(!isPlaying) startMusic(); }
+  function stopMusic(){isPlaying=false; clearInterval(schedTimer); $('#audioBtn').classList.remove('playing'); $('#audioIcon').textContent='♪'; if(master) master.gain.setTargetAtTime(0.0001,audioCtx.currentTime,.4)}
+  function startMusic(){ if(!audioCtx) return; isPlaying=true; $('#audioBtn').classList.add('playing'); $('#audioIcon').textContent='Ⅱ'; master.gain.cancelScheduledValues(audioCtx.currentTime); master.gain.setTargetAtTime(.58,audioCtx.currentTime,.3); nextNoteTime=audioCtx.currentTime+.05; schedTimer=setInterval(scheduler,25); }
+  $('#audioBtn').onclick=()=>{ if(!audioCtx||!isPlaying) unlockAudio(); else stopMusic(); };
+  const noteHz=n=>440*Math.pow(2,(n-69)/12);
+  const prog=[[38,45,50,53],[34,41,46,50],[41,48,53,57],[36,43,48,52]]; // Dm Bb F C-ish cinematic
+  const lead=[62,65,69,72,74,72,69,65,60,64,67,72,76,74,72,69];
+  function envGain(t,dur,peak=.18){const g=makeGain(0);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);return g}
+  function osc(type,f,t,dur,gain,det=0,filterFreq=1400){const o=audioCtx.createOscillator(), g=envGain(t,dur,gain), fl=audioCtx.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(f,t);o.detune.value=det;fl.type='lowpass';fl.frequency.setValueAtTime(filterFreq,t);o.connect(fl).connect(g).connect(master);o.start(t);o.stop(t+dur+.05)}
+  function kick(t){osc('sine',90,t,.20,.32,0,800); osc('sine',45,t+.04,.24,.18,0,500)}
+  function hat(t){const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*.04,audioCtx.sampleRate), data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,2);const src=audioCtx.createBufferSource(),g=envGain(t,.055,.055),hp=audioCtx.createBiquadFilter();hp.type='highpass';hp.frequency.value=6000;src.buffer=buffer;src.connect(hp).connect(g).connect(master);src.start(t)}
+  function snare(t){const buffer=audioCtx.createBuffer(1,audioCtx.sampleRate*.11,audioCtx.sampleRate), data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,2);const src=audioCtx.createBufferSource(),g=envGain(t,.16,.13),bp=audioCtx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800;src.buffer=buffer;src.connect(bp).connect(g).connect(master);src.start(t)}
+  function pad(chord,t){chord.forEach((n,i)=>{osc('sawtooth',noteHz(n),t,stepDur*7.8,.035,-8+i*3,900);osc('triangle',noteHz(n+12),t,stepDur*7.8,.022,5-i*2,1200)})}
+  function scheduler(){while(nextNoteTime<audioCtx.currentTime+.15){const bar=Math.floor(step/8), pos=step%8, chord=prog[bar%prog.length], t=nextNoteTime; if(pos===0)pad(chord,t); if(pos%2===0)kick(t); if(pos===4)snare(t); hat(t); const bass=chord[0]+(pos===6?12:0); osc('square',noteHz(bass),t,stepDur*.45,.08,0,500); const m=lead[(step+bar*2)%lead.length]+(bar%4===3?12:0); if(pos%2===1||bar>1) osc('triangle',noteHz(m),t,stepDur*.72,.075,0,1600); if(pos===7) osc('sawtooth',noteHz(m+12),t,stepDur*.9,.045,0,2400); nextNoteTime+=stepDur; step++;}}
+
+  // Lab
+  function updateLab(){const s=+$('#sVal').value,c=+$('#cVal').value,a=+$('#aVal').value,st=+$('#stVal').value,b=+$('#bVal').value;['s','c','a','st','b'].forEach(k=>$('#'+k+'Txt').textContent=$('#'+k+'Val').value); const sleep=Math.round((s/100)*(c/100)*((100-a)/100)*100); const recover=Math.round(sleep*(st/100)*(b/100)); $('#sleepMeter').style.width=Math.max(4,recover)+'%'; let text=''; if(a>65) text='A 觉醒过高：身体可能累，但大脑仍在警戒。先降光、降刺激、停止高难任务。'; else if(c<45) text='C 节律偏弱：固定起床、早晨见光比“躺床硬睡”更底层。'; else if(s<40) text='S 压力不足：午睡过长、起床太晚或白天活动太少，晚上可能不困。'; else if(st<55) text='结构不稳：总时长看起来够，也可能因为夜醒、尿意、胃肠或压力导致恢复差。'; else text='变量较匹配：此时更容易入睡并获得恢复。继续保护连续性。'; $('#labOutput').innerHTML=`<b>恢复指数：${recover}/100。</b><br>${text}`;}
+  ['sVal','cVal','aVal','stVal','bVal'].forEach(id=>$('#'+id).oninput=updateLab); updateLab();
+
+  // Sleep calc
+  function fmt(min){min=(min%1440+1440)%1440;return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0')}
+  function calc(){const [h,m]=$('#wakeTime').value.split(':').map(Number), cycle=+$('#cycleMin').value, buf=+$('#bufferMin').value, wake=h*60+m; let rows=[5,6,7,8].map(n=>`<tr><td>${n}周期</td><td>${Math.floor(n*cycle/60)}小时${n*cycle%60}分</td><td>${fmt(wake-n*cycle-buf)}</td></tr>`).join(''); $('#sleepCalcOut').innerHTML=`<table class="table"><tr><th>目标</th><th>睡眠时长</th><th>建议关灯</th></tr>${rows}</table>`;}
+  $('#calcSleep').onclick=calc; calc();
+
+  // nap
+  const naps=[['普通午后困','20–30 分钟。降低一部分 S，但尽量不进入深睡。'],['上午断片/读题不进','约 1 个完整周期。说明系统不是轻困，而是需要维护。'],['下午4点后','不长睡；最多闭眼 15–20 分钟。避免晚上 S 不够。'],['考前一晚没睡好','如果总睡眠仍≥6小时，午睡短睡；若明显崩盘，午睡完整周期并当晚早睡。']];
+  naps.forEach((n,i)=>{let b=document.createElement('button');b.className='choice';b.textContent=n[0];b.onclick=()=>{$$('#napChoices .choice').forEach(x=>x.classList.remove('correct'));b.classList.add('correct');$('#napFeedback').innerHTML='<b>'+n[0]+'</b><br>'+n[1]};$('#napChoices').appendChild(b);});
+
+  // quiz
+  const quiz=[
+    ['晚上完全不困，下午还睡了一个多小时。','S','午睡过长/太晚会降低 S，晚上睡眠压力不足。'],
+    ['很困，但一躺下脑子高速转，越想睡越清醒。','A','S 可能够了，但 A 觉醒系统太高；用力睡本身也会提高 A。'],
+    ['白天困，晚上越到后面越精神。','C','这是典型 C 后移：身体把清醒窗口推到了晚上。'],
+    ['睡了很久，但夜里醒很多次，第二天像没睡。','Structure','总时长不等于结构完整，频繁微觉醒会打断维护程序。'],
+    ['睡前喝了很多水，半夜被尿憋醒。','Body','Body 干扰会破坏睡眠连续性，不是意志问题。'],
+    ['连续几天睡够后才慢慢变清醒。','Debt','长期恢复债不是一晚能还完，需要连续稳定。'],
+    ['午睡 50 分钟被叫醒后更懵。','Inertia','可能从较深睡眠被打断，睡眠惯性强。'],
+    ['考前一晚躺下后一直担心“睡不着就完了”。','A','睡眠焦虑会反过来拉高 A，变成新的觉醒源。']
+  ];
+  const vars=['S','C','A','Structure','Body','Debt','Inertia']; let qi=0,qs=0;
+  function showQ(){let q=quiz[qi];$('#qNum').textContent=qi+1;$('#scenarioText').textContent=q[0];$('#quizChoices').innerHTML='';$('#quizFeedback').textContent='选择一个变量。';vars.forEach(v=>{let b=document.createElement('button');b.className='choice';b.textContent=v;b.onclick=()=>{if(v===q[1]){b.classList.add('correct');qs++;$('#qScore').textContent=qs;$('#quizFeedback').innerHTML=`<b>正确：${v}</b><br>${q[2]}`}else{b.classList.add('wrong');$('#quizFeedback').innerHTML=`<b>不优先。</b><br>这题优先看 ${q[1]}：${q[2]}`}};$('#quizChoices').appendChild(b);});}
+  $('#nextQuiz').onclick=()=>{qi=(qi+1)%quiz.length;showQ()}; showQ();
+
+  // chain game
+  const chain=['看见题目','识别信息','保持条件','调用知识','推理计算','抑制错误冲动','检查修正']; let chainStep=0, chainScore=0;
+  function setupChain(){const shuffled=[...chain].sort(()=>Math.random()-.5);$('#chainGame').innerHTML='';shuffled.forEach(n=>{let b=document.createElement('button');b.className='nodeBtn';b.textContent=n;b.onclick=()=>{if(n===chain[chainStep]){b.classList.add('done');chainStep++;chainScore++;$('#chainScore').textContent=chainScore;$('#nextNeed').textContent=chain[chainStep]||'完成';$('#chainFeedback').innerHTML=`<b>正确。</b> 睡眠不足会让这条链在任意一环掉线。`; if(chainStep===chain.length){$('#chainFeedback').innerHTML='<b>完成。</b> 这就是为什么高考不是只考知识库存，而是考稳定调用链。';}}else{b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),500);$('#chainFeedback').innerHTML=`<b>顺序不对。</b> 你不能先“${n}”，因为前面的输入、保持或调用还没有完成。`}};$('#chainGame').appendChild(b);});}
+  setupChain();
+
+  // protocol
+  const protocols={
+    '正常日':['主目标：保持稳定输出。',['夜间 6–7 周期，状态差偏 7。','上午放清晰度任务，晚上做确定性任务。','午睡默认 20–30 分钟。'],'禁止：晚上用高难题把 A 拉爆。'],
+    '轻度崩盘':['主目标：阻断恶性循环。',['降低难题比例，保基础和错题结论。','午睡可用完整周期。','当晚优先 7 周期。'],'禁止：白天没学好就用熬夜补偿。'],
+    '重度崩盘':['主目标：防止系统继续坏。',['任务降到最低有效。','午睡能完整周期就完整周期。','当晚 7 周期，必要时临时 8。'],'禁止：咖啡因硬顶、突然高强度运动、情绪化大计划。'],
+    '考前一晚':['主目标：低唤醒休息。',['提前检查用品，只确认一次流程。','睡不着时离床低刺激等待困意。','不要把“必须睡着”变成新压力。'],'禁止：压轴题、对答案、大复盘。'],
+    '考试当天':['主目标：适度唤醒，不过载。',['自然光、熟悉早餐、不猛灌水。','考前只看确定性材料。','卡住时呼气放慢，重读题干关键词。'],'禁止：陌生食物、刺激饮料、和别人互相恐吓。']
+  };
+  Object.keys(protocols).forEach((k,i)=>{let b=document.createElement('button');b.className='miniBtn'+(i===0?' active':'');b.textContent=k;b.onclick=()=>{ $$('#protocolTabs .miniBtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');showProt(k)};$('#protocolTabs').appendChild(b);});
+  function showProt(k){let p=protocols[k];$('#protocolBody').innerHTML=`<h4>${k}</h4><p>${p[0]}</p><ul>${p[1].map(x=>'<li>'+x+'</li>').join('')}</ul><p style="color:var(--danger)"><b>禁止动作：</b>${p[2].replace('禁止：','')}</p>`}showProt('正常日');
+
+  // catch game
+  const good=['晨光','短午睡','低唤醒','整理书包','轻拉伸','纸质低难度']; const bad=['强光','压轴题','刷视频','大复盘','争论','能量饮料','临睡规划']; let catchTimer,remain=20,arousal=70;
+  function spawnWord(){const area=$('#catchArea'), w=document.createElement('button'), isBad=Math.random()<.62;w.className='floatWord '+(isBad?'bad':'good');w.textContent=(isBad?bad:good)[Math.floor(Math.random()*(isBad?bad.length:good.length))];w.style.left=Math.random()*75+5+'%';w.style.top=Math.random()*75+5+'%';w.onclick=()=>{if(isBad){arousal=Math.max(0,arousal-8);w.remove()}else{arousal=Math.min(100,arousal+5);w.remove()}$('#arousalScore').textContent=arousal};area.appendChild(w);setTimeout(()=>w.remove(),5200)}
+  $('#catchStart').onclick=()=>{clearInterval(catchTimer);$('#catchArea').innerHTML='';remain=20;arousal=70;$('#catchTime').textContent=remain;$('#arousalScore').textContent=arousal;catchTimer=setInterval(()=>{remain--;$('#catchTime').textContent=remain;spawnWord(); if(remain<=0){clearInterval(catchTimer);let msg=document.createElement('div');msg.className='feedback';msg.style.margin='18px';msg.innerHTML=arousal<45?'<b>睡眠窗口保护成功。</b><br>A 已明显下降。':'<b>A 仍偏高。</b><br>说明刺激源清理不够，睡前还需要继续降唤醒。';$('#catchArea').appendChild(msg)}},1000)};
+})();
+</script>
+</body>
+</html>
